@@ -12,22 +12,25 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed top-0 w-full z-50">
-      <div className="bg-[#1a1b1e]">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="h-16 flex items-center justify-between">
+    <div className="w-full fixed top-0 z-50 px-4 py-3">
+      <nav className="max-w-7xl mx-auto rounded-2xl bg-[#1a1b1e]/95 shadow-xl border border-white/[0.05]">
+        <div className="px-6">
+          <div className="h-14 flex items-center justify-between">
             {/* Logo Section */}
             <div className="flex-shrink-0">
               <Link href="/" className="flex items-center">
                 <span className="font-bold text-2xl tracking-tight text-blue-300">
                   CP
                 </span>
+                <span className="font-bold text-2xl tracking-tight text-white">
+                  -Now
+                </span>
               </Link>
             </div>
 
             {/* Center Navigation */}
             <div className="flex-1 flex justify-center space-x-4">
-              <div className="bg-black/20 rounded-full p-1 flex items-center">
+              <div className="bg-black/30 rounded-full p-1 flex items-center backdrop-blur-sm">
                 <Link
                   href="/"
                   className={`
@@ -78,10 +81,10 @@ export default function Navbar() {
 
             {/* Right Section - Avatar */}
             <div className="flex-shrink-0">
-              <button className="flex items-center justify-center h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200">
+              <button className="flex items-center justify-center h-10 w-10 rounded-full bg-black/30 hover:bg-white/10 transition-all duration-200 backdrop-blur-sm">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 text-white/90"
+                  className="h-5 w-5 text-white/90"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
@@ -95,7 +98,7 @@ export default function Navbar() {
             </div>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </div>
   );
 }
