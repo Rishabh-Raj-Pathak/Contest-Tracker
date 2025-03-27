@@ -14,7 +14,7 @@ export default function FilterSection() {
     },
     {
       name: "CodeChef",
-      logo: "https://img.icons8.com/carbon_copy/200/4D4D4D/codechef.png",
+      logo: "https://img.icons8.com/fluent-systems-filled/512/FFFFFF/codechef.png",
     },
     {
       name: "LeetCode",

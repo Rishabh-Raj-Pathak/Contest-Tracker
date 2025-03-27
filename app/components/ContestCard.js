@@ -102,7 +102,7 @@ export default function ContestCard({
         border: "border-[#1FA34B]/20",
         badge: "bg-[#1FA34B]/10 text-[#1FA34B]",
         hover: "hover:border-[#1FA34B]/40",
-        logo: "https://www.codechef.com/sites/all/themes/abessive/favicon.ico",
+        logo: "https://img.icons8.com/fluent-systems-filled/512/FFFFFF/codechef.png",
         button: "bg-[#1FA34B]/10 hover:bg-[#1FA34B]/20 text-[#1FA34B]",
       },
     };
