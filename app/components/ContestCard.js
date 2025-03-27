@@ -111,11 +111,21 @@ export default function ContestCard({
 
   const getStatusStyles = (status) => {
     const styles = {
-      upcoming: "bg-orange-500/20 text-orange-400",
-      ongoing: "bg-green-500/20 text-green-400",
-      past: "bg-zinc-500/20 text-zinc-400",
+      upcoming: "bg-green-500/20 text-green-400",
+      ongoing: "bg-red-500/20 text-red-400",
+      past: "bg-yellow-500/20 text-yellow-400",
     };
     return styles[status.toLowerCase()] || styles.upcoming;
+  };
+
+  const getTimeLeftStyles = (timeText) => {
+    if (timeText === "Live Now") {
+      return "bg-red-500/20 text-red-400 animate-pulse";
+    }
+    if (timeText === "Contest Ended") {
+      return "bg-yellow-500/20 text-yellow-400";
+    }
+    return "bg-white/5 text-white/90";
   };
 
   const platformStyle = getPlatformStyles(platform);
@@ -123,7 +133,7 @@ export default function ContestCard({
   return (
     <div
       className={`group relative rounded-2xl bg-[#1a1b1e]/95 border ${
-        status === "past" ? "opacity-75" : "opacity-100"
+        status === "past" ? "opacity-90" : "opacity-100"
       } ${platformStyle.border} ${
         platformStyle.hover
       } backdrop-blur-sm transition-all duration-300 hover:translate-y-[-2px] hover:shadow-xl`}
@@ -195,10 +205,12 @@ export default function ContestCard({
             <span>Starts on: {formatDate(startTime)}</span>
           </div>
 
-          <div className="px-3 py-2 rounded-xl bg-white/5 text-center">
-            <span className="text-sm font-medium text-white/90">
-              {timeLeft}
-            </span>
+          <div
+            className={`px-3 py-2 rounded-xl ${getTimeLeftStyles(
+              timeLeft
+            )} backdrop-blur-sm`}
+          >
+            <span className="text-sm font-medium">{timeLeft}</span>
           </div>
 
           <div className="flex items-center gap-2 text-sm text-white/60">
