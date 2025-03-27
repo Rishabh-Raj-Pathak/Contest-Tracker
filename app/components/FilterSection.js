@@ -13,7 +13,7 @@ export default function FilterSection() {
     },
     {
       name: "CodeChef",
-      logo: "https://play-lh.googleusercontent.com/S6jZCYEg6IITdHCCOd_1CnOBmzhoC_FL8oMyunTr64o9kxtV_CUYeTgx8epLS2lPmS8",
+      logo: "https://img.icons8.com/carbon_copy/200/4D4D4D/codechef.png",
     },
     {
       name: "LeetCode",
