@@ -6,133 +6,96 @@ export default function Navbar() {
   const pathname = usePathname();
 
   const isActiveTab = (path) => {
-    return pathname === path ? "tab-active" : "";
+    return pathname === path
+      ? "bg-white/90 text-gray-900 shadow-sm"
+      : "text-white/90 hover:bg-white/10";
   };
 
   return (
-    <div className="navbar bg-white border-b shadow-sm h-16">
-      {/* Logo Section */}
-      <div className="navbar-start pl-4">
-        <Link
-          href="/"
-          className="btn btn-ghost gap-2 normal-case text-xl hover:bg-base-200"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-            />
-          </svg>
-          <span className="font-semibold">Contest Tracker</span>
-        </Link>
-      </div>
+    <nav className="fixed top-0 w-full z-50">
+      <div className="bg-[#1a1b1e]">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="h-16 flex items-center justify-between">
+            {/* Logo Section */}
+            <div className="flex-shrink-0">
+              <Link href="/" className="flex items-center">
+                <span className="font-bold text-2xl tracking-tight text-blue-300">
+                  CP
+                </span>
+              </Link>
+            </div>
 
-      {/* Navigation Tabs - Desktop */}
-      <div className="navbar-center hidden lg:flex">
-        <div className="tabs tabs-boxed bg-base-200 p-1 gap-1">
-          <Link
-            href="/"
-            className={`tab min-w-[120px] ${isActiveTab(
-              "/"
-            )} hover:bg-base-100 transition-colors duration-200`}
-          >
-            Contests
-          </Link>
-          <Link
-            href="/calendar"
-            className={`tab min-w-[120px] ${isActiveTab(
-              "/calendar"
-            )} hover:bg-base-100 transition-colors duration-200`}
-          >
-            Calendar
-          </Link>
-          <Link
-            href="/videos"
-            className={`tab min-w-[120px] ${isActiveTab(
-              "/videos"
-            )} hover:bg-base-100 transition-colors duration-200`}
-          >
-            Videos
-          </Link>
+            {/* Center Navigation */}
+            <div className="flex-1 flex justify-center space-x-4">
+              <div className="bg-black/20 rounded-full p-1 flex items-center">
+                <Link
+                  href="/"
+                  className={`
+                    px-6 py-2 rounded-full font-medium
+                    transition-all duration-200 flex items-center gap-2
+                    ${isActiveTab("/")}
+                  `}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>Contests</span>
+                </Link>
+
+                <Link
+                  href="/calendar"
+                  className={`
+                    px-6 py-2 rounded-full font-medium
+                    transition-all duration-200 flex items-center gap-2
+                    ${isActiveTab("/calendar")}
+                  `}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>Calendar</span>
+                </Link>
+              </div>
+            </div>
+
+            {/* Right Section - Avatar */}
+            <div className="flex-shrink-0">
+              <button className="flex items-center justify-center h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-white/90"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* Theme Toggle & Mobile Menu */}
-      <div className="navbar-end pr-4">
-        <button className="btn btn-ghost btn-circle hover:bg-base-200">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-            />
-          </svg>
-        </button>
-
-        {/* Mobile Menu */}
-        <div className="dropdown dropdown-end lg:hidden">
-          <label
-            tabIndex={0}
-            className="btn btn-ghost btn-circle hover:bg-base-200"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </label>
-          <ul
-            tabIndex={0}
-            className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-lg bg-base-100 rounded-box w-52"
-          >
-            <li>
-              <Link href="/" className={pathname === "/" ? "active" : ""}>
-                Contests
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/calendar"
-                className={pathname === "/calendar" ? "active" : ""}
-              >
-                Calendar
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/videos"
-                className={pathname === "/videos" ? "active" : ""}
-              >
-                Videos
-              </Link>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
+    </nav>
   );
 }
