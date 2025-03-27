@@ -1,29 +1,49 @@
 "use client";
 import { useState, useEffect } from "react";
 
-const formatTimeLeft = (startTime) => {
+const formatTimeLeft = (startTime, status) => {
+  if (status === "past") return "Contest Ended";
+  if (status === "ongoing") return "Live Now";
+
   const now = new Date();
   const contestStart = new Date(startTime);
-  const diff = contestStart - now;
 
-  if (diff <= 0) return "Started";
+  // Convert to IST (UTC+5:30)
+  const istOffset = 5.5 * 60 * 60 * 1000; // 5.5 hours in milliseconds
+  const istNow = new Date(now.getTime() + istOffset);
+  const istContestStart = new Date(contestStart.getTime() + istOffset);
 
+  const diff = istContestStart - istNow;
+
+  if (diff <= 0) return "Live Now";
+
+  // Calculate hours, minutes, seconds
   const hours = Math.floor(diff / (1000 * 60 * 60));
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
   const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-  return `${hours}h : ${minutes}m : ${seconds}s`;
+  // Format with leading zeros
+  const formattedHours = String(hours).padStart(2, "0");
+  const formattedMinutes = String(minutes).padStart(2, "0");
+  const formattedSeconds = String(seconds).padStart(2, "0");
+
+  return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
 };
 
 const formatDate = (date) => {
-  return new Date(date).toLocaleString("en-US", {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    hour: "numeric",
-    minute: "numeric",
-    hour12: true,
-  });
+  // Convert to IST for display
+  const istDate = new Date(new Date(date).getTime() + 5.5 * 60 * 60 * 1000);
+  return (
+    istDate.toLocaleString("en-US", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+      timeZone: "UTC", // Since we manually added IST offset
+    }) + " IST"
+  );
 };
 
 export default function ContestCard({
@@ -34,20 +54,33 @@ export default function ContestCard({
   status,
   isBookmarked = false,
 }) {
-  const [timeLeft, setTimeLeft] = useState("Loading...");
+  const [timeLeft, setTimeLeft] = useState(formatTimeLeft(startTime, status));
   const [bookmarked, setBookmarked] = useState(isBookmarked);
 
   useEffect(() => {
+    // Only set up timer for upcoming contests
+    if (status !== "upcoming") {
+      setTimeLeft(formatTimeLeft(startTime, status));
+      return;
+    }
+
     // Initial calculation
-    setTimeLeft(formatTimeLeft(startTime));
+    setTimeLeft(formatTimeLeft(startTime, status));
 
     // Update every second
     const timer = setInterval(() => {
-      setTimeLeft(formatTimeLeft(startTime));
+      const newTimeLeft = formatTimeLeft(startTime, status);
+      setTimeLeft(newTimeLeft);
+
+      // If contest has started, clear interval
+      if (newTimeLeft === "Live Now") {
+        clearInterval(timer);
+      }
     }, 1000);
 
+    // Cleanup on unmount
     return () => clearInterval(timer);
-  }, [startTime]);
+  }, [startTime, status]);
 
   const getPlatformStyles = (platform) => {
     const styles = {
@@ -66,11 +99,11 @@ export default function ContestCard({
         button: "bg-[#318CE7]/10 hover:bg-[#318CE7]/20 text-[#318CE7]",
       },
       codechef: {
-        border: "border-[#9B4E1C]/20",
-        badge: "bg-[#9B4E1C]/10 text-[#9B4E1C]",
-        hover: "hover:border-[#9B4E1C]/40",
-        logo: "https://cdn.codechef.com/images/favicon-32x32.png",
-        button: "bg-[#9B4E1C]/10 hover:bg-[#9B4E1C]/20 text-[#9B4E1C]",
+        border: "border-[#1FA34B]/20",
+        badge: "bg-[#1FA34B]/10 text-[#1FA34B]",
+        hover: "hover:border-[#1FA34B]/40",
+        logo: "https://www.codechef.com/sites/all/themes/abessive/favicon.ico",
+        button: "bg-[#1FA34B]/10 hover:bg-[#1FA34B]/20 text-[#1FA34B]",
       },
     };
     return styles[platform.toLowerCase()] || styles.leetcode;
