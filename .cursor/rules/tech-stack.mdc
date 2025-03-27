@@ -1,0 +1,26 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+
+- You can @ files here
+- You can use markdown but dont have to
+
+# Folder Structure and Coding Practices Rules for Cursor (JavaScript Only)
+
+## Overview
+Generate a modular, modern, and optimized folder structure and code for web applications using the specified tech stack (JavaScript, Next.js, React, TailwindCSS, DaisyUI, Supabase, AuthJS, Vercel). Prioritize scalability for up to 10,000+ users, neat organization for frequent changes, and best coding practices for performance, maintainability, and deployment readiness.
+
+## Tech Stack Reference
+- Use JavaScript as the primary language for development (no TypeScript).
+- Frontend: Next.js (React-based framework for fast, SEO-friendly apps), React (for dynamic UI), TailwindCSS (for rapid styling), DaisyUI (for pre-built UI components).
+- Backend: Next.js API Routes (for simple CRUD and API operations), Supabase (PostgreSQL) (for relational data, auth, and real-time, scaling to 10,000+ users).
+- Auth : Use supabase
+- Deployment: Vercel (for one-click deploys and automatic scaling to 10,000+ users).
+
+## Folder Structure Guidelines
+- Create a modular, scalable folder structure for a Next.js project, optimized for frequent changes and large user bases.
+- Use the following structure as a base, adapting as needed for specific features (e.g., portfolio, OpenSox, NEX.art):

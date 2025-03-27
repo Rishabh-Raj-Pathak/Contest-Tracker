@@ -1,0 +1,26 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+
+- You can @ files here
+- You can use markdown but dont have to
+
+Contest Tracker
+
+- Description
+    - Build a contest tracker that fetches all the upcoming contests from Codeforces, CodeChef, and Leetcode.
+    - Show the date of each contest and time remaining before starting.
+    - Also show the past contests in the last 2 weeks.
+    - also have another section to show calendar view.
+    - Have a filter to allow the users to select contests from only 1 or more platforms. Eg: Only from Codeforces, or from Codeforces + Leetcode.
+    - Allow the users to bookmark a contest.
+    - Have a way to populate the link to the contest solution from Youtube (TLE Eliminators (1st priority) or any other relevent source) of a past contest. If you want to handle this manually, you can make a separate URL which contains a form where you can select the contest and attach the corresponding link from our channel.
+    - Bonus: Automatically fetch the links from Youtube and add them once the solution is uploaded without requiring a person to do it manually.
+    - Bonus: Add an option for people to sign up for contest reminders for a platform. Allow them to choose b/w email and sms reminders. Also allow them to choose when to get the reminder. Eg: 1 hour or 30 minutes before the contest.
+
+Contest Page demo ui: ![image.png](mdc:attachment:50b0aded-d175-4a6d-ad86-3ab06421810c:image.png)
+Upload Videos page demo ui : ![image.png](mdc:attachment:426ae430-b340-4bfe-80ad-b2e6fb15ad4e:image.png)
