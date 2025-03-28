@@ -23,7 +23,7 @@ export default function Navbar() {
                   CP
                 </span>
                 <span className="font-bold text-2xl tracking-tight text-white">
-                  -Now
+                  -Hunt
                 </span>
               </Link>
             </div>
