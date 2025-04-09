@@ -1,0 +1,86 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+
+- You can @ files here
+- You can use markdown but dont have to
+
+## **Coding Practices Guidelines**
+
+### **Project Structure & Modularity**
+
+- Ensure components and pages are small, focused, and reusable to support modularity and frequent updates.
+- Organize files with clear, descriptive names (e.g., `project-card.js`, `authApi.js`).
+
+### **Coding Standards**
+
+- Use **JavaScript** for all files, avoiding TypeScript to simplify development and reduce setup complexity.
+- Follow **modern JavaScript practices**:
+    - Use ES6+ features (e.g., `async/await`, destructuring, spread operator).
+    - Write functional, stateless components where possible, using React hooks (e.g., `useState`, `useEffect`).
+    - Apply memoization with `React.memo` or `useMemo` for performance optimization in lists or frequent renders.
+- Use **TailwindCSS and DaisyUI** for styling, ensuring responsive, clean UIs with utility classes and pre-built components.
+
+### **Modular Code Practices**
+
+- Break code into small, single-responsibility functions and components.
+- Avoid global state where possible; use React Context or custom hooks for state management.
+- Export functions/components individually for easy imports (e.g., `export const ProjectCard = () => {...}`).
+
+### **Performance Optimization**
+
+- Use Next.js’ `getStaticProps`, `getServerSideProps`, or `getStaticPaths` for efficient page rendering.
+- Lazy-load components with `React.lazy` and `Suspense` for large pages (e.g., project lists in OpenSox).
+- Minimize re-renders with `useCallback` for event handlers and `useMemo` for computed values.
+
+### **Scalability for 10,000+ Users**
+
+- Use Supabase’s real-time subscriptions for live updates (e.g., OpenSox project changes), but cache frequently accessed data locally.
+- Batch database queries with Supabase’s client to reduce API calls.
+- Leverage Vercel’s global CDN and auto-scaling for deployment performance.
+
+---
+
+## **Backend & Database - Supabase (PostgreSQL)**
+
+- Query data using the Supabase JavaScript client (`@supabase/supabase-js`) for CRUD operations, auth, and real-time features.
+- Avoid over-fetching; use selective queries (e.g., `supabase.from('projects').select('id, name')`).
+- Store environment variables (e.g., Supabase URL, API keys) in `.env.local` and load them via Next.js’ `process.env`.
+
+### **Authentication - Supabase Auth**
+
+- Implement secure user login, registration, and session management with Supabase Auth, integrating with Supabase auth.
+- Protect routes and APIs with Next.js middleware or API route guards.
+
+---
+
+## **Deployment & Optimization**
+
+- Deploy to **Vercel** for one-click deploys, automatic scaling, and global CDN performance for 10,000+ users.
+- Use environment variables in `.env.local` for secrets (e.g., Supabase keys), accessed via `process.env`.
+- Optimize builds with Next.js configuration (e.g., `next.config.js` for image optimization, static exports).
+- Test performance with Vercel’s analytics or tools like Lighthouse to ensure readiness for many users.
+
+---
+
+## **Scalability & Real-Time Updates**
+
+- Ensure code and structure support frequent changes by keeping modules small and decoupled.
+- Optimize for many users (up to 10,000+) by caching data, batching requests, and using Vercel’s auto-scaling.
+- Handle real-time updates with Supabase.
+
+---
+
+## **Cursor-Specific Instructions**
+
+- Generate code and folder structures based on this modular, modern approach, prioritizing JavaScript, Next.js, and Supabase.
+- Use TailwindCSS and DaisyUI for styling, ensuring responsiveness and clean UIs.
+- Avoid monolithic files; split logic into components, hooks, and utilities for maintainability.
+- Reference files in the `/app`, `/components`, `/hooks`, `/utils`, etc., directories for context (e.g., `@ src/components/ProjectCard.js`).
+- Optimize for performance and scalability, ensuring Vercel deployment readiness and Supabase real-time capabilities.
+
+---
