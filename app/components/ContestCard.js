@@ -17,8 +17,9 @@ const formatTimeLeft = (startTime, status) => {
 
   if (diff <= 0) return "Live Now";
 
-  // Calculate hours, minutes, seconds
-  const hours = Math.floor(diff / (1000 * 60 * 60));
+  // Calculate days, hours, minutes, seconds
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
   const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
@@ -27,23 +28,42 @@ const formatTimeLeft = (startTime, status) => {
   const formattedMinutes = String(minutes).padStart(2, "0");
   const formattedSeconds = String(seconds).padStart(2, "0");
 
+  // Return formatted string
+  if (days > 0) {
+    return `${days}d ${formattedHours}h ${formattedMinutes}m ${formattedSeconds}s`;
+  }
   return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
 };
 
 const formatDate = (date) => {
   // Convert to IST for display
   const istDate = new Date(new Date(date).getTime() + 5.5 * 60 * 60 * 1000);
-  return (
-    istDate.toLocaleString("en-US", {
-      weekday: "short",
-      day: "numeric",
-      month: "short",
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-      timeZone: "UTC", // Since we manually added IST offset
-    }) + " IST"
-  );
+
+  const day = istDate.getUTCDate();
+  const month = istDate.toLocaleString("en-US", {
+    month: "short",
+    timeZone: "UTC",
+  });
+  const weekday = istDate.toLocaleString("en-US", {
+    weekday: "short",
+    timeZone: "UTC",
+  });
+  const year = istDate.getUTCFullYear();
+  const time = istDate.toLocaleString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "UTC",
+  });
+
+  // Add ordinal suffix to day
+  const ordinal = (n) => {
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  };
+
+  return `${weekday}, ${ordinal(day)} ${month} ${year} at ${time} IST`;
 };
 
 export default function ContestCard({
@@ -53,6 +73,7 @@ export default function ContestCard({
   duration,
   status,
   isBookmarked = false,
+  url,
 }) {
   const [timeLeft, setTimeLeft] = useState(formatTimeLeft(startTime, status));
   const [bookmarked, setBookmarked] = useState(isBookmarked);
@@ -235,9 +256,16 @@ export default function ContestCard({
         {/* Join Button */}
         <div className="pt-2">
           <button
+            onClick={() => {
+              const contestUrl =
+                status === "upcoming" && platform === "Codeforces"
+                  ? "https://codeforces.com/contests"
+                  : url;
+              window.open(contestUrl, "_blank");
+            }}
             className={`w-full px-4 py-2 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2 group ${platformStyle.button}`}
           >
-            Join Contest
+            {status === "upcoming" ? "View Contests" : "Join Contest"}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"

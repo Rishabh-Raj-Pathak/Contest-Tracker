@@ -1,10 +1,14 @@
 "use client";
 import { useState } from "react";
 
-export default function FilterSection() {
-  const [selectedPlatforms, setSelectedPlatforms] = useState([]);
-  const [selectedStatus, setSelectedStatus] = useState("all");
-  const [bookmarkedOnly, setBookmarkedOnly] = useState(false);
+export default function FilterSection({
+  selectedPlatforms,
+  setSelectedPlatforms,
+  selectedStatus,
+  setSelectedStatus,
+  bookmarkedOnly,
+  setBookmarkedOnly,
+}) {
   const [isFilterVisible, setIsFilterVisible] = useState(false);
 
   const platforms = [
@@ -61,17 +65,17 @@ export default function FilterSection() {
       {/* Filter Section */}
       <div
         className={`
-        fixed md:relative top-0 right-0 h-full md:h-auto
-        w-[280px] md:w-[280px] 
-        rounded-2xl bg-[#1a1b1e]/95 shadow-xl border border-white/[0.05] 
-        p-6 space-y-6 backdrop-blur-sm
-        transition-transform duration-300 z-40
-        ${
-          isFilterVisible
-            ? "translate-x-0"
-            : "translate-x-full md:translate-x-0"
-        }
-      `}
+          fixed md:relative top-0 right-0 h-full md:h-auto
+          w-[280px] md:w-[280px] 
+          rounded-2xl bg-[#1a1b1e]/95 shadow-xl border border-white/[0.05] 
+          p-6 space-y-6 backdrop-blur-sm
+          transition-transform duration-300 z-40
+          ${
+            isFilterVisible
+              ? "translate-x-0"
+              : "translate-x-full md:translate-x-0"
+          }
+        `}
       >
         {/* Close Button for Mobile */}
         <button
