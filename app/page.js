@@ -13,8 +13,10 @@ import {
 export default function Home() {
   const [codeforcesContests, setCodeforcesContests] = useState([]);
   const [leetcodeContests, setLeetcodeContests] = useState([]);
+  const [codechefContests, setCodechefContests] = useState([]);
   const [loadingCodeforces, setLoadingCodeforces] = useState(true);
   const [loadingLeetcode, setLoadingLeetcode] = useState(true);
+  const [loadingCodechef, setLoadingCodechef] = useState(true);
   const [selectedPlatforms, setSelectedPlatforms] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [bookmarkedOnly, setBookmarkedOnly] = useState(false);
@@ -53,6 +55,14 @@ export default function Home() {
 
       // Update isBookmarked property for LeetCode contests
       setLeetcodeContests((prevContests) =>
+        prevContests.map((contest) => ({
+          ...contest,
+          isBookmarked: isContestBookmarked(contest),
+        }))
+      );
+
+      // Update isBookmarked property for CodeChef contests
+      setCodechefContests((prevContests) =>
         prevContests.map((contest) => ({
           ...contest,
           isBookmarked: isContestBookmarked(contest),
@@ -107,6 +117,57 @@ export default function Home() {
     } finally {
       setLoadingLeetcode(false);
     }
+
+    // Fetch CodeChef contests separately
+    await fetchCodeChefContests();
+  }
+
+  async function fetchCodeChefContests(refresh = false) {
+    try {
+      setLoadingCodechef(true);
+      const url = refresh
+        ? "/api/contests/codechef?refresh=true"
+        : "/api/contests/codechef";
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Failed to fetch CodeChef contests");
+      }
+
+      const data = await response.json();
+      console.log("CodeChef data:", data);
+
+      // Combine and format contests
+      const ccContests = [
+        ...data.upcoming.map((contest) => ({
+          ...contest,
+          platform: "CodeChef",
+          title: contest.name,
+          duration: contest.duration || "2h 30m",
+          status: "upcoming",
+        })),
+        ...data.past30Days.map((contest) => ({
+          ...contest,
+          platform: "CodeChef",
+          title: contest.name,
+          duration: contest.duration || "2h 30m",
+          status: "past",
+        })),
+      ];
+
+      // Apply bookmark status to each contest
+      const ccContestsWithBookmarks = ccContests.map((contest) => ({
+        ...contest,
+        isBookmarked: isContestBookmarked(contest),
+      }));
+
+      setCodechefContests(ccContestsWithBookmarks);
+      console.log(`Loaded ${ccContests.length} CodeChef contests`);
+    } catch (error) {
+      console.error("Error fetching CodeChef contests:", error);
+    } finally {
+      setLoadingCodechef(false);
+    }
   }
 
   // Filter and sort all contests
@@ -146,7 +207,7 @@ export default function Home() {
       });
     }
 
-    // Otherwise, combine contests from both platforms
+    // Otherwise, combine contests from all platforms
     let allContests = [
       ...codeforcesContests.filter(
         (contest) =>
@@ -154,6 +215,11 @@ export default function Home() {
           selectedPlatforms.includes(contest.platform)
       ),
       ...leetcodeContests.filter(
+        (contest) =>
+          selectedPlatforms.length === 0 ||
+          selectedPlatforms.includes(contest.platform)
+      ),
+      ...codechefContests.filter(
         (contest) =>
           selectedPlatforms.length === 0 ||
           selectedPlatforms.includes(contest.platform)
@@ -194,7 +260,7 @@ export default function Home() {
   const allFilteredContests = filteredContests();
 
   // Determine if we're still loading
-  const isLoading = loadingCodeforces || loadingLeetcode;
+  const isLoading = loadingCodeforces || loadingLeetcode || loadingCodechef;
 
   // Get status text for heading
   const getStatusText = () => {

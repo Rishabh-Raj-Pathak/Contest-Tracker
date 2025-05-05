@@ -180,8 +180,30 @@ export default function ContestCard({
         logo: "https://img.icons8.com/fluent-systems-filled/512/FFFFFF/codechef.png",
         button: "bg-[#1FA34B]/10 hover:bg-[#1FA34B]/20 text-[#1FA34B]",
       },
+      // Add uppercase case variants for compatibility
+      CodeChef: {
+        border: "border-[#1FA34B]/20",
+        badge: "bg-[#1FA34B]/10 text-[#1FA34B]",
+        hover: "hover:border-[#1FA34B]/40",
+        logo: "https://img.icons8.com/fluent-systems-filled/512/FFFFFF/codechef.png",
+        button: "bg-[#1FA34B]/10 hover:bg-[#1FA34B]/20 text-[#1FA34B]",
+      },
+      Codeforces: {
+        border: "border-[#318CE7]/30",
+        badge: "bg-[#318CE7]/10 text-[#318CE7]",
+        hover: "hover:border-[#318CE7]/50",
+        logo: "https://codeforces.org/s/0/favicon-32x32.png",
+        button: "bg-[#318CE7]/10 hover:bg-[#318CE7]/20 text-[#318CE7]",
+      },
+      LeetCode: {
+        border: "border-[#FFA116]/20",
+        badge: "bg-[#FFA116]/10 text-[#FFA116]",
+        hover: "hover:border-[#FFA116]/40",
+        logo: "https://leetcode.com/favicon-32x32.png",
+        button: "bg-[#FFA116]/10 hover:bg-[#FFA116]/20 text-[#FFA116]",
+      },
     };
-    return styles[platform.toLowerCase()] || styles.leetcode;
+    return styles[platform] || styles.leetcode;
   };
 
   const getStatusStyles = (status) => {
