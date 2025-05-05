@@ -4,10 +4,13 @@ import { useEffect, useState } from "react";
 import FilterSection from "./components/FilterSection";
 import ContestCard from "./components/ContestCard";
 import { getCodeforcesContests } from "./lib/api/codeforces";
+import { getLeetCodeContests } from "./lib/api/leetcode";
 
 export default function Home() {
-  const [contests, setContests] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [codeforcesContests, setCodeforcesContests] = useState([]);
+  const [leetcodeContests, setLeetcodeContests] = useState([]);
+  const [loadingCodeforces, setLoadingCodeforces] = useState(true);
+  const [loadingLeetcode, setLoadingLeetcode] = useState(true);
   const [selectedPlatforms, setSelectedPlatforms] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [bookmarkedOnly, setBookmarkedOnly] = useState(false);
@@ -17,38 +20,82 @@ export default function Home() {
   }, []);
 
   async function fetchContests() {
+    // Fetch Codeforces contests first (usually faster)
     try {
-      const codeforcesContests = await getCodeforcesContests();
-      setContests(codeforcesContests);
+      setLoadingCodeforces(true);
+      const cfContests = await getCodeforcesContests();
+      setCodeforcesContests(cfContests);
+      console.log(`Loaded ${cfContests.length} Codeforces contests`);
     } catch (error) {
-      console.error("Error fetching contests:", error);
+      console.error("Error fetching Codeforces contests:", error);
     } finally {
-      setLoading(false);
+      setLoadingCodeforces(false);
+    }
+
+    // Fetch LeetCode contests separately
+    try {
+      setLoadingLeetcode(true);
+      const lcContests = await getLeetCodeContests();
+      setLeetcodeContests(lcContests);
+      console.log(`Loaded ${lcContests.length} LeetCode contests`);
+    } catch (error) {
+      console.error("Error fetching LeetCode contests:", error);
+    } finally {
+      setLoadingLeetcode(false);
     }
   }
 
-  // Filter contests based on selected filters
-  const filteredContests = contests.filter((contest) => {
-    // Platform filter
-    if (
-      selectedPlatforms.length > 0 &&
-      !selectedPlatforms.includes(contest.platform)
-    ) {
-      return false;
+  // Filter and sort all contests
+  const filteredContests = () => {
+    // Combine contests from both platforms
+    let allContests = [
+      ...codeforcesContests.filter(
+        (contest) =>
+          selectedPlatforms.length === 0 ||
+          selectedPlatforms.includes(contest.platform)
+      ),
+      ...leetcodeContests.filter(
+        (contest) =>
+          selectedPlatforms.length === 0 ||
+          selectedPlatforms.includes(contest.platform)
+      ),
+    ];
+
+    // Apply status filter
+    if (selectedStatus !== "all") {
+      allContests = allContests.filter(
+        (contest) => contest.status === selectedStatus
+      );
     }
 
-    // Status filter
-    if (selectedStatus !== "all" && contest.status !== selectedStatus) {
-      return false;
+    // Apply bookmark filter
+    if (bookmarkedOnly) {
+      allContests = allContests.filter((contest) => contest.isBookmarked);
     }
 
-    // Bookmark filter
-    if (bookmarkedOnly && !contest.isBookmarked) {
-      return false;
-    }
+    // Sort by status and time
+    return allContests.sort((a, b) => {
+      // Sort by status first (ongoing -> upcoming -> past)
+      const statusOrder = { ongoing: 0, upcoming: 1, past: 2 };
+      if (statusOrder[a.status] !== statusOrder[b.status]) {
+        return statusOrder[a.status] - statusOrder[b.status];
+      }
 
-    return true;
-  });
+      // For upcoming contests, sort by start time (ascending)
+      if (a.status === "upcoming") {
+        return new Date(a.startTime) - new Date(b.startTime);
+      }
+
+      // For past contests, sort by start time (descending)
+      return new Date(b.startTime) - new Date(a.startTime);
+    });
+  };
+
+  // Get the combined filtered contests
+  const allFilteredContests = filteredContests();
+
+  // Determine if we're still loading
+  const isLoading = loadingCodeforces || loadingLeetcode;
 
   // Get status text for heading
   const getStatusText = () => {
@@ -85,11 +132,12 @@ export default function Home() {
             {getStatusText()}
           </h1>
           <span className="text-sm text-white/60">
-            {filteredContests.length} contests found
+            {allFilteredContests.length} contests found
           </span>
         </div>
 
-        {loading ? (
+        {/* Contest Grid */}
+        {isLoading ? (
           // Loading skeleton
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
             {[...Array(4)].map((_, index) => (
@@ -99,13 +147,18 @@ export default function Home() {
               />
             ))}
           </div>
-        ) : (
+        ) : allFilteredContests.length > 0 ? (
           // Contest Cards Grid
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            {filteredContests.map((contest, index) => (
-              <ContestCard key={index} {...contest} />
+            {allFilteredContests.map((contest, index) => (
+              <ContestCard key={`contest-${index}`} {...contest} />
             ))}
           </div>
+        ) : (
+          // No contests found
+          <p className="text-white/60 py-10 text-center">
+            No contests found matching your filters.
+          </p>
         )}
       </div>
     </div>
