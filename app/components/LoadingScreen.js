@@ -18,18 +18,23 @@ export default function LoadingScreen() {
   useEffect(() => {
     isClient.current = true;
 
-    // Check if this is the first load of the session
-    const hasVisitedInSession = sessionStorage.getItem("hasVisitedCP");
+    // Check if this is a new browser session
+    const lastVisitTimestamp = localStorage.getItem("cpTrackerLastVisit");
+    const currentTime = new Date().getTime();
 
-    if (hasVisitedInSession) {
-      // Skip loading screen if already visited in this session
+    // If we have a timestamp and it's from the current session (less than 30 minutes ago)
+    // Skip the loading screen
+    if (
+      lastVisitTimestamp &&
+      currentTime - parseInt(lastVisitTimestamp) < 30 * 60 * 1000
+    ) {
       setShouldShow(false);
       setLoaded(true);
       return;
     }
 
-    // Mark as visited for this session
-    sessionStorage.setItem("hasVisitedCP", "true");
+    // Store current timestamp in localStorage
+    localStorage.setItem("cpTrackerLastVisit", currentTime.toString());
 
     // Generate random particles
     const newParticles = Array.from({ length: 15 }, () => ({
@@ -51,10 +56,10 @@ export default function LoadingScreen() {
       );
     }, 800);
 
-    // Always show loading screen for 3.5 seconds
+    // Always show loading screen for 3 seconds
     const timer = setTimeout(() => {
       setLoaded(true);
-    }, 3500);
+    }, 3000);
 
     // Clean up timers
     return () => {
