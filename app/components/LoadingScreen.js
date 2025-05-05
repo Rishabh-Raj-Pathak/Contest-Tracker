@@ -136,7 +136,7 @@ export default function LoadingScreen() {
             </div>
             <div className="pl-4">
               <span className="text-white/70">
-                // Loading contests from multiple platforms
+                {/* Loading contests from multiple platforms */}
               </span>
             </div>
             <div className="pl-4">
@@ -199,7 +199,7 @@ export default function LoadingScreen() {
 
         .loading-progress-bar {
           width: 0;
-          animation: loading 3.5s linear forwards;
+          animation: loading 3s linear forwards;
         }
 
         @keyframes loading {
