@@ -2,7 +2,6 @@
 "use server";
 
 import { startScheduler } from "../lib/scheduler";
-import { testScraper } from "../lib/test-scraper";
 
 // Initialize the scheduler on server side
 let isInitialized = false;
@@ -11,11 +10,8 @@ export default async function SchedulerInitializer() {
   // Only initialize once to prevent multiple scheduler instances
   if (typeof window === "undefined" && !isInitialized) {
     isInitialized = true;
-
-    // Test the scraper first
-    await testScraper();
-
-    // Then start the scheduler
+    
+    // Start the scheduler
     startScheduler();
   }
 

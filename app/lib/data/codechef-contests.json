@@ -1,4 +1,58 @@
 {
-  "upcoming": [],
-  "past30Days": []
+  "upcoming": [
+    {
+      "id": "START185D",
+      "name": "Starters 185",
+      "url": "https://www.codechef.com/START185D",
+      "startTime": "2025-05-07T15:40:48.980Z",
+      "duration": "2h 30m",
+      "status": "upcoming"
+    },
+    {
+      "id": "START186D",
+      "name": "Starters 186",
+      "url": "https://www.codechef.com/START186D",
+      "startTime": "2025-05-14T15:40:48.983Z",
+      "duration": "2h 30m",
+      "status": "upcoming"
+    }
+  ],
+  "past30Days": [
+    {
+      "id": "START184",
+      "name": "Starters 184 (Rated till 5 star)",
+      "url": "https://www.codechef.com/START184",
+      "startTime": "2025-04-30T14:30:00.000Z",
+      "duration": "2h 30m",
+      "participants": 19600,
+      "status": "past"
+    },
+    {
+      "id": "START183",
+      "name": "Starters 183 (Rated till 6 star)",
+      "url": "https://www.codechef.com/START183",
+      "startTime": "2025-04-23T14:30:00.000Z",
+      "duration": "2h 30m",
+      "participants": 24530,
+      "status": "past"
+    },
+    {
+      "id": "START182",
+      "name": "Starters 182 (Rated till 5 star)",
+      "url": "https://www.codechef.com/START182",
+      "startTime": "2025-04-16T14:30:00.000Z",
+      "duration": "2h 30m",
+      "participants": 32303,
+      "status": "past"
+    },
+    {
+      "id": "START181",
+      "name": "Starters 181 (Rated for all)",
+      "url": "https://www.codechef.com/START181",
+      "startTime": "2025-04-09T14:30:00.000Z",
+      "duration": "2h 30m",
+      "participants": 37549,
+      "status": "past"
+    }
+  ]
 }
