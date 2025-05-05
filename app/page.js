@@ -5,6 +5,10 @@ import FilterSection from "./components/FilterSection";
 import ContestCard from "./components/ContestCard";
 import { getCodeforcesContests } from "./lib/api/codeforces";
 import { getLeetCodeContests } from "./lib/api/leetcode";
+import {
+  getBookmarkedContests,
+  isContestBookmarked,
+} from "./lib/bookmarkStorage";
 
 export default function Home() {
   const [codeforcesContests, setCodeforcesContests] = useState([]);
@@ -14,9 +18,55 @@ export default function Home() {
   const [selectedPlatforms, setSelectedPlatforms] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [bookmarkedOnly, setBookmarkedOnly] = useState(false);
+  const [bookmarkedContests, setBookmarkedContests] = useState([]);
 
   useEffect(() => {
+    // Load bookmarked contests from localStorage
+    const loadBookmarkedContests = () => {
+      if (typeof window !== "undefined") {
+        const bookmarked = getBookmarkedContests();
+        setBookmarkedContests(bookmarked);
+      }
+    };
+
+    loadBookmarkedContests();
     fetchContests();
+
+    // Listen for storage events to update bookmarks when changed in another tab
+    const handleStorageChange = (e) => {
+      if (e.key === "bookmarked-contests") {
+        loadBookmarkedContests();
+      }
+    };
+
+    // Listen for bookmark change events from ContestCard
+    const handleBookmarkChange = () => {
+      loadBookmarkedContests();
+
+      // Update isBookmarked property for Codeforces contests
+      setCodeforcesContests((prevContests) =>
+        prevContests.map((contest) => ({
+          ...contest,
+          isBookmarked: isContestBookmarked(contest),
+        }))
+      );
+
+      // Update isBookmarked property for LeetCode contests
+      setLeetcodeContests((prevContests) =>
+        prevContests.map((contest) => ({
+          ...contest,
+          isBookmarked: isContestBookmarked(contest),
+        }))
+      );
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("bookmarkChange", handleBookmarkChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("bookmarkChange", handleBookmarkChange);
+    };
   }, []);
 
   async function fetchContests() {
@@ -24,7 +74,14 @@ export default function Home() {
     try {
       setLoadingCodeforces(true);
       const cfContests = await getCodeforcesContests();
-      setCodeforcesContests(cfContests);
+
+      // Apply bookmark status to each contest
+      const cfContestsWithBookmarks = cfContests.map((contest) => ({
+        ...contest,
+        isBookmarked: isContestBookmarked(contest),
+      }));
+
+      setCodeforcesContests(cfContestsWithBookmarks);
       console.log(`Loaded ${cfContests.length} Codeforces contests`);
     } catch (error) {
       console.error("Error fetching Codeforces contests:", error);
@@ -36,7 +93,14 @@ export default function Home() {
     try {
       setLoadingLeetcode(true);
       const lcContests = await getLeetCodeContests();
-      setLeetcodeContests(lcContests);
+
+      // Apply bookmark status to each contest
+      const lcContestsWithBookmarks = lcContests.map((contest) => ({
+        ...contest,
+        isBookmarked: isContestBookmarked(contest),
+      }));
+
+      setLeetcodeContests(lcContestsWithBookmarks);
       console.log(`Loaded ${lcContests.length} LeetCode contests`);
     } catch (error) {
       console.error("Error fetching LeetCode contests:", error);
@@ -47,7 +111,42 @@ export default function Home() {
 
   // Filter and sort all contests
   const filteredContests = () => {
-    // Combine contests from both platforms
+    // Start with all bookmarked contests if bookmarkedOnly is true
+    if (bookmarkedOnly) {
+      let bookmarkedFilteredByPlatform = bookmarkedContests;
+
+      // Apply platform filter if needed
+      if (selectedPlatforms.length > 0) {
+        bookmarkedFilteredByPlatform = bookmarkedContests.filter((contest) =>
+          selectedPlatforms.includes(contest.platform)
+        );
+      }
+
+      // Apply status filter if needed
+      if (selectedStatus !== "all") {
+        bookmarkedFilteredByPlatform = bookmarkedFilteredByPlatform.filter(
+          (contest) => contest.status === selectedStatus
+        );
+      }
+
+      return bookmarkedFilteredByPlatform.sort((a, b) => {
+        // Sort by status first (ongoing -> upcoming -> past)
+        const statusOrder = { ongoing: 0, upcoming: 1, past: 2 };
+        if (statusOrder[a.status] !== statusOrder[b.status]) {
+          return statusOrder[a.status] - statusOrder[b.status];
+        }
+
+        // For upcoming contests, sort by start time (ascending)
+        if (a.status === "upcoming") {
+          return new Date(a.startTime) - new Date(b.startTime);
+        }
+
+        // For past contests, sort by start time (descending)
+        return new Date(b.startTime) - new Date(a.startTime);
+      });
+    }
+
+    // Otherwise, combine contests from both platforms
     let allContests = [
       ...codeforcesContests.filter(
         (contest) =>
@@ -68,7 +167,7 @@ export default function Home() {
       );
     }
 
-    // Apply bookmark filter
+    // Apply bookmark filter if needed
     if (bookmarkedOnly) {
       allContests = allContests.filter((contest) => contest.isBookmarked);
     }
@@ -122,6 +221,7 @@ export default function Home() {
           setSelectedStatus={setSelectedStatus}
           bookmarkedOnly={bookmarkedOnly}
           setBookmarkedOnly={setBookmarkedOnly}
+          showDisclaimer={true}
         />
       </aside>
 
@@ -134,6 +234,14 @@ export default function Home() {
           <span className="text-sm text-white/60">
             {allFilteredContests.length} contests found
           </span>
+        </div>
+
+        {/* Mobile Disclaimer */}
+        <div className="lg:hidden p-3 bg-white/5 rounded-lg mb-4">
+          <p className="text-xs text-white/50 leading-tight">
+            Note: This platform shows upcoming contests and past contests from
+            the last 30 days only.
+          </p>
         </div>
 
         {/* Contest Grid */}

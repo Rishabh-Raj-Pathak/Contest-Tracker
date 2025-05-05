@@ -8,6 +8,7 @@ export default function FilterSection({
   setSelectedStatus,
   bookmarkedOnly,
   setBookmarkedOnly,
+  showDisclaimer = false,
 }) {
   const [isFilterVisible, setIsFilterVisible] = useState(false);
 
@@ -186,6 +187,16 @@ export default function FilterSection({
             <span className="text-sm font-medium">Bookmarked Only</span>
           </button>
         </div>
+
+        {/* Disclaimer */}
+        {showDisclaimer && (
+          <div className="pt-4 mt-2 border-t border-white/10">
+            <p className="text-xs text-white/50 leading-tight">
+              Note: This platform shows upcoming contests and past contests from
+              the last 30 days only.
+            </p>
+          </div>
+        )}
       </div>
     </>
   );

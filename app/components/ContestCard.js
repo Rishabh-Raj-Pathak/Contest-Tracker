@@ -1,5 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
+import {
+  addBookmark,
+  removeBookmark,
+  isContestBookmarked,
+} from "../lib/bookmarkStorage";
 
 const formatTimeLeft = (startTime, status) => {
   if (status === "past") return "Contest Ended";
@@ -79,6 +84,25 @@ export default function ContestCard({
   const [bookmarked, setBookmarked] = useState(isBookmarked);
 
   useEffect(() => {
+    // Check if this contest is already bookmarked in localStorage
+    const checkBookmarkStatus = () => {
+      if (typeof window !== "undefined") {
+        const isBookmarked = isContestBookmarked({
+          platform,
+          title,
+          startTime,
+          duration,
+          status,
+          url,
+        });
+        setBookmarked(isBookmarked);
+      }
+    };
+
+    checkBookmarkStatus();
+  }, [platform, title, startTime, duration, status, url]);
+
+  useEffect(() => {
     // Only set up timer for upcoming contests
     if (status !== "upcoming") {
       setTimeLeft(formatTimeLeft(startTime, status));
@@ -102,6 +126,36 @@ export default function ContestCard({
     // Cleanup on unmount
     return () => clearInterval(timer);
   }, [startTime, status]);
+
+  const handleBookmarkToggle = () => {
+    const contestData = {
+      platform,
+      title,
+      startTime,
+      duration,
+      status,
+      url,
+    };
+
+    if (bookmarked) {
+      removeBookmark(contestData);
+    } else {
+      addBookmark(contestData);
+    }
+
+    setBookmarked(!bookmarked);
+
+    // Dispatch a custom event to notify about bookmark changes
+    if (typeof window !== "undefined") {
+      const event = new CustomEvent("bookmarkChange", {
+        detail: {
+          contest: contestData,
+          isBookmarked: !bookmarked,
+        },
+      });
+      window.dispatchEvent(event);
+    }
+  };
 
   const getPlatformStyles = (platform) => {
     const styles = {
@@ -189,7 +243,7 @@ export default function ContestCard({
             </h3>
           </div>
           <button
-            onClick={() => setBookmarked(!bookmarked)}
+            onClick={handleBookmarkToggle}
             className="p-2 rounded-xl transition-all duration-200 hover:bg-white/5"
           >
             <svg
