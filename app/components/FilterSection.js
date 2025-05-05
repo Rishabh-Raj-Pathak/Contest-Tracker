@@ -16,14 +16,17 @@ export default function FilterSection({
     {
       name: "Codeforces",
       logo: "https://codeforces.org/s/0/favicon-32x32.png",
+      color: "#318CE7",
     },
     {
       name: "CodeChef",
       logo: "https://img.icons8.com/fluent-systems-filled/512/FFFFFF/codechef.png",
+      color: "#1FA34B",
     },
     {
       name: "LeetCode",
       logo: "https://leetcode.com/favicon-32x32.png",
+      color: "#FFA116",
     },
   ];
 
@@ -40,6 +43,34 @@ export default function FilterSection({
         ? prev.filter((p) => p !== platform)
         : [...prev, platform]
     );
+  };
+
+  // Get platform-specific hover color
+  const getPlatformHoverClass = (platform) => {
+    switch (platform) {
+      case "Codeforces":
+        return "hover:bg-[#318CE7]/10 hover:border-[#318CE7]/30";
+      case "CodeChef":
+        return "hover:bg-[#1FA34B]/10 hover:border-[#1FA34B]/30";
+      case "LeetCode":
+        return "hover:bg-[#FFA116]/10 hover:border-[#FFA116]/30";
+      default:
+        return "hover:bg-white/5";
+    }
+  };
+
+  // Get platform-specific active color
+  const getPlatformActiveClass = (platform) => {
+    switch (platform) {
+      case "Codeforces":
+        return "bg-[#318CE7]/10 border-[#318CE7]/30 text-[#318CE7]";
+      case "CodeChef":
+        return "bg-[#1FA34B]/10 border-[#1FA34B]/30 text-[#1FA34B]";
+      case "LeetCode":
+        return "bg-[#FFA116]/10 border-[#FFA116]/30 text-[#FFA116]";
+      default:
+        return "bg-white/10";
+    }
   };
 
   return (
@@ -122,10 +153,12 @@ export default function FilterSection({
               <button
                 key={platform.name}
                 onClick={() => togglePlatform(platform.name)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 border ${
                   selectedPlatforms.includes(platform.name)
-                    ? "bg-white/10 shadow-inner"
-                    : "hover:bg-white/5"
+                    ? getPlatformActiveClass(platform.name)
+                    : `border-transparent ${getPlatformHoverClass(
+                        platform.name
+                      )}`
                 }`}
               >
                 <img
@@ -133,7 +166,15 @@ export default function FilterSection({
                   alt={platform.name}
                   className="w-5 h-5 rounded"
                 />
-                <span className="text-sm text-white/90">{platform.name}</span>
+                <span
+                  className={`text-sm ${
+                    selectedPlatforms.includes(platform.name)
+                      ? ""
+                      : "text-white/90"
+                  }`}
+                >
+                  {platform.name}
+                </span>
               </button>
             ))}
           </div>
