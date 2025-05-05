@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 
 export default function LoadingScreen() {
   const [loaded, setLoaded] = useState(false);
+  const [shouldShow, setShouldShow] = useState(true);
   const [activeStep, setActiveStep] = useState(0);
   const [particles, setParticles] = useState([]);
   const isClient = useRef(false);
@@ -13,9 +14,22 @@ export default function LoadingScreen() {
     "Preparing your dashboard...",
   ];
 
-  // Generate particles only on the client side
+  // Check if we should show the loading screen
   useEffect(() => {
     isClient.current = true;
+
+    // Check if this is the first load of the session
+    const hasVisitedInSession = sessionStorage.getItem("hasVisitedCP");
+
+    if (hasVisitedInSession) {
+      // Skip loading screen if already visited in this session
+      setShouldShow(false);
+      setLoaded(true);
+      return;
+    }
+
+    // Mark as visited for this session
+    sessionStorage.setItem("hasVisitedCP", "true");
 
     // Generate random particles
     const newParticles = Array.from({ length: 15 }, () => ({
@@ -49,7 +63,7 @@ export default function LoadingScreen() {
     };
   }, []);
 
-  if (loaded) {
+  if (loaded || !shouldShow) {
     return null;
   }
 

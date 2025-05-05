@@ -2,9 +2,7 @@
 import { useState, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import listPlugin from "@fullcalendar/list";
 import { useRouter } from "next/navigation";
 import ContestModal from "../components/ContestModal";
 // Import the same fetching functions used in the main page
@@ -18,7 +16,6 @@ export default function CalendarPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [allContests, setAllContests] = useState([]);
-  const [calendarView, setCalendarView] = useState("dayGridMonth");
   const [debugInfo, setDebugInfo] = useState({ loaded: false, count: 0 });
 
   // State for platform-specific contests, same as in the main page
@@ -320,11 +317,6 @@ export default function CalendarPage() {
     setModalOpen(true);
   };
 
-  // Handle view change
-  const handleViewChange = (viewInfo) => {
-    setCalendarView(viewInfo.view.type);
-  };
-
   // Handle contest click in modal
   const handleContestClick = (contest) => {
     // Close the modal
@@ -474,34 +466,18 @@ export default function CalendarPage() {
               )}
 
               <FullCalendar
-                plugins={[
-                  dayGridPlugin,
-                  timeGridPlugin,
-                  interactionPlugin,
-                  listPlugin,
-                ]}
-                initialView={
-                  window.innerWidth < 768 ? "listMonth" : "dayGridMonth"
-                }
+                plugins={[dayGridPlugin, interactionPlugin]}
+                initialView="dayGridMonth"
                 headerToolbar={{
                   left:
                     window.innerWidth < 640 ? "prev,next" : "prev,next today",
                   center: "title",
-                  right:
-                    window.innerWidth < 640
-                      ? "dayGridMonth,listMonth"
-                      : "dayGridMonth,timeGridWeek,listMonth",
+                  right: "dayGridMonth",
                 }}
                 events={events}
                 eventClick={handleEventClick}
                 dateClick={handleDateClick}
-                height={
-                  calendarView === "listMonth"
-                    ? "auto"
-                    : window.innerWidth < 768
-                    ? 600
-                    : 800
-                }
+                height={window.innerWidth < 768 ? 600 : 800}
                 themeSystem="standard"
                 dayMaxEvents={window.innerWidth < 768 ? 2 : 3}
                 eventTimeFormat={{
@@ -509,7 +485,6 @@ export default function CalendarPage() {
                   minute: "2-digit",
                   hour12: true,
                 }}
-                viewDidMount={handleViewChange}
                 // Mobile optimization
                 stickyHeaderDates={true}
                 className="contest-calendar"
