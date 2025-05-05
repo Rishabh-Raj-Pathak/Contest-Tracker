@@ -29,6 +29,20 @@ export default function CalendarPage() {
   const [loadingLeetcode, setLoadingLeetcode] = useState(true);
   const [loadingCodechef, setLoadingCodechef] = useState(true);
 
+  // Use client-side only rendering for date-related elements
+  const [formattedDate, setFormattedDate] = useState("");
+
+  // Format date in useEffect to avoid hydration mismatch
+  useEffect(() => {
+    // Update date display after component mounts (client-side only)
+    const updateDateDisplay = () => {
+      const now = new Date();
+      setFormattedDate(now.toLocaleDateString("en-US")); // Force en-US locale for consistency
+    };
+
+    updateDateDisplay();
+  }, []);
+
   // Fetch contest data - updated to match the main page's approach
   useEffect(() => {
     async function fetchContests() {
@@ -352,13 +366,13 @@ export default function CalendarPage() {
   return (
     <div className="space-y-8 pb-16">
       {/* Premium Header with Glass Effect */}
-      <div className="rounded-2xl bg-gradient-to-r from-[#1a1b1e]/90 to-[#2a2b30]/90 border border-white/[0.08] p-8 shadow-2xl backdrop-blur-md">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-3">
-            <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
+      <div className="rounded-2xl bg-gradient-to-r from-[#1a1b1e]/90 to-[#2a2b30]/90 border border-white/[0.08] p-4 sm:p-6 md:p-8 shadow-2xl backdrop-blur-md">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
+          <div className="space-y-2 md:space-y-3">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
               Contest Calendar
             </h1>
-            <p className="text-white/60 max-w-xl">
+            <p className="text-sm sm:text-base text-white/60 max-w-xl">
               Track upcoming and ongoing programming contests across major
               competitive coding platforms. Click on any day to see detailed
               contest information.
@@ -366,33 +380,33 @@ export default function CalendarPage() {
           </div>
 
           {/* Platform Legend - Premium Style */}
-          <div className="flex flex-wrap gap-4 p-4 bg-white/5 rounded-xl border border-white/10">
-            <div className="flex items-center gap-3 px-3 py-2 bg-[#318CE7]/10 rounded-lg border border-[#318CE7]/20 transition-all duration-300 hover:bg-[#318CE7]/20 hover:scale-105">
+          <div className="flex flex-wrap gap-2 sm:gap-4 p-3 sm:p-4 bg-white/5 rounded-xl border border-white/10">
+            <div className="flex items-center gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-[#318CE7]/10 rounded-lg border border-[#318CE7]/20 transition-all duration-300 hover:bg-[#318CE7]/20 hover:scale-105">
               <div className="relative">
-                <div className="w-3 h-3 rounded-full bg-[#318CE7]"></div>
+                <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-[#318CE7]"></div>
                 <div className="absolute -inset-1 bg-[#318CE7]/20 rounded-full animate-pulse"></div>
               </div>
-              <span className="text-sm font-medium text-white/90">
+              <span className="text-xs sm:text-sm font-medium text-white/90">
                 Codeforces
               </span>
             </div>
 
-            <div className="flex items-center gap-3 px-3 py-2 bg-[#FFA116]/10 rounded-lg border border-[#FFA116]/20 transition-all duration-300 hover:bg-[#FFA116]/20 hover:scale-105">
+            <div className="flex items-center gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-[#FFA116]/10 rounded-lg border border-[#FFA116]/20 transition-all duration-300 hover:bg-[#FFA116]/20 hover:scale-105">
               <div className="relative">
-                <div className="w-3 h-3 rounded-full bg-[#FFA116]"></div>
+                <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-[#FFA116]"></div>
                 <div className="absolute -inset-1 bg-[#FFA116]/20 rounded-full animate-pulse"></div>
               </div>
-              <span className="text-sm font-medium text-white/90">
+              <span className="text-xs sm:text-sm font-medium text-white/90">
                 LeetCode
               </span>
             </div>
 
-            <div className="flex items-center gap-3 px-3 py-2 bg-[#1FA34B]/10 rounded-lg border border-[#1FA34B]/20 transition-all duration-300 hover:bg-[#1FA34B]/20 hover:scale-105">
+            <div className="flex items-center gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-[#1FA34B]/10 rounded-lg border border-[#1FA34B]/20 transition-all duration-300 hover:bg-[#1FA34B]/20 hover:scale-105">
               <div className="relative">
-                <div className="w-3 h-3 rounded-full bg-[#1FA34B]"></div>
+                <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-[#1FA34B]"></div>
                 <div className="absolute -inset-1 bg-[#1FA34B]/20 rounded-full animate-pulse"></div>
               </div>
-              <span className="text-sm font-medium text-white/90">
+              <span className="text-xs sm:text-sm font-medium text-white/90">
                 CodeChef
               </span>
             </div>
@@ -407,7 +421,7 @@ export default function CalendarPage() {
         <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl"></div>
 
         {/* Calendar header bar */}
-        <div className="relative z-10 border-b border-white/10 bg-white/5 backdrop-blur-md px-4 py-3 mb-2">
+        <div className="relative z-10 border-b border-white/10 bg-white/5 backdrop-blur-md px-2 sm:px-4 py-2 sm:py-3 mb-1 sm:mb-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-red-400 animate-pulse"></div>
@@ -419,7 +433,7 @@ export default function CalendarPage() {
             </div>
 
             <div className="hidden md:flex items-center gap-2 text-xs text-white/30">
-              <span>{new Date().toLocaleDateString()}</span>
+              <span className="date-display">{formattedDate}</span>
               <span>|</span>
               <span>
                 {events.length} Contest{events.length !== 1 ? "s" : ""}
@@ -429,7 +443,7 @@ export default function CalendarPage() {
         </div>
 
         {/* Calendar content */}
-        <div className="relative z-10 p-4 md:p-6">
+        <div className="relative z-10 p-2 sm:p-4 md:p-6">
           {loading ? (
             <div className="py-20 flex flex-col items-center justify-center">
               <div className="relative w-16 h-16">
@@ -466,11 +480,17 @@ export default function CalendarPage() {
                   interactionPlugin,
                   listPlugin,
                 ]}
-                initialView="dayGridMonth"
+                initialView={
+                  window.innerWidth < 768 ? "listMonth" : "dayGridMonth"
+                }
                 headerToolbar={{
-                  left: "prev,next today",
+                  left:
+                    window.innerWidth < 640 ? "prev,next" : "prev,next today",
                   center: "title",
-                  right: "dayGridMonth,timeGridWeek,listMonth",
+                  right:
+                    window.innerWidth < 640
+                      ? "dayGridMonth,listMonth"
+                      : "dayGridMonth,timeGridWeek,listMonth",
                 }}
                 events={events}
                 eventClick={handleEventClick}
@@ -479,11 +499,11 @@ export default function CalendarPage() {
                   calendarView === "listMonth"
                     ? "auto"
                     : window.innerWidth < 768
-                    ? 650
+                    ? 600
                     : 800
                 }
                 themeSystem="standard"
-                dayMaxEvents={3}
+                dayMaxEvents={window.innerWidth < 768 ? 2 : 3}
                 eventTimeFormat={{
                   hour: "2-digit",
                   minute: "2-digit",
@@ -505,9 +525,9 @@ export default function CalendarPage() {
                   const tooltip = document.createElement("div");
                   tooltip.className = "calendar-tooltip";
 
-                  // Format date properly
+                  // Format date properly with explicit locale
                   const eventDate = new Date(info.event.start);
-                  const formattedTime = eventDate.toLocaleTimeString([], {
+                  const formattedTime = eventDate.toLocaleTimeString("en-US", {
                     hour: "2-digit",
                     minute: "2-digit",
                     hour12: true,
@@ -1027,6 +1047,45 @@ export default function CalendarPage() {
 
           .contest-calendar .fc-col-header-cell-cushion {
             padding: 6px 2px;
+          }
+
+          .calendar-tooltip {
+            max-width: calc(100% - 20px);
+            left: 10px !important;
+            right: 10px;
+            font-size: 0.8rem;
+          }
+
+          .tooltip-title {
+            font-size: 0.9rem;
+          }
+        }
+
+        /* Small mobile screens */
+        @media (max-width: 480px) {
+          .contest-calendar .fc-toolbar-title {
+            font-size: 1rem !important;
+          }
+
+          .contest-calendar .fc-button {
+            padding: 4px 8px;
+            font-size: 0.7rem;
+          }
+
+          .contest-calendar .fc-col-header-cell-cushion,
+          .contest-calendar .fc-daygrid-day-number {
+            font-size: 0.7rem;
+            padding: 2px 4px;
+          }
+
+          .contest-calendar .fc-list-day-text,
+          .contest-calendar .fc-list-day-side-text {
+            font-size: 0.85rem;
+          }
+
+          .contest-calendar .fc-list-event-time,
+          .contest-calendar .fc-list-event-title {
+            font-size: 0.8rem;
           }
         }
       `}</style>

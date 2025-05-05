@@ -10,6 +10,32 @@ export default function ContestModal({
 }) {
   const modalRef = useRef(null);
   const [animateIn, setAnimateIn] = useState(false);
+  const [formattedDate, setFormattedDate] = useState("");
+  const [dayOfWeek, setDayOfWeek] = useState("");
+  const [dayNumber, setDayNumber] = useState("");
+
+  // Format dates in useEffect to avoid hydration mismatches
+  useEffect(() => {
+    if (date) {
+      // Format date for display with explicit locale
+      setFormattedDate(
+        date.toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      );
+
+      // Get day of week for the sidebar
+      setDayOfWeek(
+        date.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase()
+      );
+
+      // Get day number for display
+      setDayNumber(date.getDate().toString());
+    }
+  }, [date]);
 
   // Handle animation
   useEffect(() => {
@@ -64,16 +90,6 @@ export default function ContestModal({
 
   if (!isOpen) return null;
 
-  // Format date for display
-  const formattedDate = date
-    ? date.toLocaleDateString("en-US", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    : "";
-
   // Get platform color
   const getPlatformColor = (platform) => {
     switch (platform.toLowerCase()) {
@@ -103,17 +119,9 @@ export default function ContestModal({
     );
   });
 
-  // Get day number for display
-  const dayNumber = date ? date.getDate() : "";
-
-  // Get day of week for the sidebar
-  const dayOfWeek = date
-    ? date.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase()
-    : "";
-
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md transition-opacity duration-300 ${
+      className={`fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-md transition-opacity duration-300 ${
         animateIn ? "opacity-100" : "opacity-0"
       }`}
     >
@@ -124,27 +132,27 @@ export default function ContestModal({
       {/* Main modal container */}
       <div
         ref={modalRef}
-        className={`relative w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-2xl bg-gradient-to-b from-[#1a1b1e]/95 to-[#23242b]/95 border border-white/[0.08] shadow-2xl transition-all duration-300 ${
+        className={`relative w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-b from-[#1a1b1e]/95 to-[#23242b]/95 border border-white/[0.08] shadow-2xl transition-all duration-300 ${
           animateIn ? "translate-y-0 scale-100" : "translate-y-8 scale-95"
         }`}
       >
         {/* Modal sidebar - date indicator */}
-        <div className="absolute top-0 left-0 bottom-0 w-16 md:w-20 bg-gradient-to-b from-purple-500/20 to-blue-500/20 border-r border-white/[0.08] flex flex-col items-center justify-center">
+        <div className="absolute top-0 left-0 bottom-0 w-12 sm:w-16 md:w-20 bg-gradient-to-b from-purple-500/20 to-blue-500/20 border-r border-white/[0.08] flex flex-col items-center justify-center">
           <div className="flex flex-col items-center">
             <div className="text-xs font-semibold text-white/60 mb-1">
               {dayOfWeek}
             </div>
-            <div className="text-2xl md:text-3xl font-bold text-white">
+            <div className="text-xl sm:text-2xl md:text-3xl font-bold text-white">
               {dayNumber}
             </div>
           </div>
         </div>
 
         {/* Modal content */}
-        <div className="ml-16 md:ml-20">
+        <div className="ml-12 sm:ml-16 md:ml-20">
           {/* Header */}
-          <div className="sticky top-0 z-10 flex items-center justify-between p-5 border-b border-white/10 bg-black/20 backdrop-blur-md">
-            <h2 className="text-xl md:text-2xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
+          <div className="sticky top-0 z-10 flex items-center justify-between p-3 sm:p-4 md:p-5 border-b border-white/10 bg-black/20 backdrop-blur-md">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
               {formattedDate}
             </h2>
             <button
@@ -153,7 +161,7 @@ export default function ContestModal({
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 text-white/70"
+                className="h-4 w-4 sm:h-5 sm:w-5 text-white/70"
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -167,15 +175,15 @@ export default function ContestModal({
           </div>
 
           {/* Body with custom scrollbar */}
-          <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto custom-scrollbar">
+          <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6 max-h-[75vh] overflow-y-auto custom-scrollbar">
             {dateContests.length > 0 ? (
               <>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-white/10">
+                <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                  <div className="relative flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white/10">
                     <div className="absolute inset-0 rounded-full bg-white/5 animate-ping opacity-60"></div>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 text-white/80"
+                      className="h-3 w-3 sm:h-4 sm:w-4 text-white/80"
                       viewBox="0 0 20 20"
                       fill="currentColor"
                     >
@@ -186,20 +194,20 @@ export default function ContestModal({
                       />
                     </svg>
                   </div>
-                  <p className="text-white/80 font-medium">
+                  <p className="text-sm sm:text-base text-white/80 font-medium">
                     {dateContests.length} contest
                     {dateContests.length > 1 ? "s" : ""} scheduled
                   </p>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {dateContests.map((contest, index) => {
                     const platformColor = getPlatformColor(contest.platform);
                     return (
                       <div
                         key={`${contest.platform}-${contest.title}-${index}`}
                         onClick={() => onContestClick(contest)}
-                        className="group relative p-5 rounded-xl border backdrop-blur-sm cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
+                        className="group relative p-3 sm:p-4 md:p-5 rounded-lg sm:rounded-xl border backdrop-blur-sm cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
                         style={{
                           borderColor: `${platformColor}30`,
                           backgroundColor: `${platformColor}08`,
@@ -208,7 +216,7 @@ export default function ContestModal({
                       >
                         {/* Gradient hover effect */}
                         <div
-                          className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          className="absolute inset-0 rounded-lg sm:rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                           style={{
                             background: `linear-gradient(45deg, ${platformColor}10, transparent)`,
                           }}
@@ -222,10 +230,10 @@ export default function ContestModal({
                           }}
                         ></div>
 
-                        <div className="relative flex items-start gap-4">
+                        <div className="relative flex items-start gap-3 sm:gap-4">
                           {/* Platform icon with glow */}
                           <div
-                            className="relative flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+                            className="relative flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center"
                             style={{ backgroundColor: `${platformColor}20` }}
                           >
                             <div
@@ -242,15 +250,15 @@ export default function ContestModal({
                                   : "https://img.icons8.com/fluent-systems-filled/512/FFFFFF/codechef.png"
                               }
                               alt={contest.platform}
-                              className="w-6 h-6 rounded object-contain"
+                              className="w-5 h-5 sm:w-6 sm:h-6 rounded object-contain"
                             />
                           </div>
 
-                          <div className="flex-1 space-y-3">
+                          <div className="flex-1 space-y-2 sm:space-y-3">
                             {/* Top badges row */}
-                            <div className="flex items-center gap-2 flex-wrap">
+                            <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
                               <span
-                                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                className="inline-flex items-center px-1.5 sm:px-2.5 py-0.5 rounded-full text-xs font-medium"
                                 style={{
                                   backgroundColor: `${platformColor}20`,
                                   color: platformColor,
@@ -260,7 +268,7 @@ export default function ContestModal({
                               </span>
 
                               <span
-                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                className={`inline-flex items-center px-1.5 sm:px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                   contest.status === "ongoing"
                                     ? "bg-red-100 text-red-800"
                                     : contest.status === "upcoming"
@@ -276,10 +284,10 @@ export default function ContestModal({
                               </span>
 
                               {contest.duration && (
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/10 text-white/70">
+                                <span className="inline-flex items-center px-1.5 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/10 text-white/70">
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
-                                    className="h-3 w-3 mr-1"
+                                    className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1"
                                     viewBox="0 0 20 20"
                                     fill="currentColor"
                                   >
@@ -295,16 +303,16 @@ export default function ContestModal({
                             </div>
 
                             {/* Title */}
-                            <h3 className="text-lg font-semibold text-white group-hover:text-white transition-colors">
+                            <h3 className="text-base sm:text-lg font-semibold text-white group-hover:text-white transition-colors">
                               {contest.title}
                             </h3>
 
                             {/* Time and Duration in a styled box */}
-                            <div className="bg-black/20 rounded-lg p-3 space-y-2 border border-white/5">
-                              <div className="flex items-center gap-2 text-sm text-white/70">
+                            <div className="bg-black/20 rounded-lg p-2 sm:p-3 space-y-1 sm:space-y-2 border border-white/5">
+                              <div className="flex items-center gap-2 text-xs sm:text-sm text-white/70">
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4 text-white/50"
+                                  className="h-3 w-3 sm:h-4 sm:w-4 text-white/50"
                                   fill="none"
                                   viewBox="0 0 24 24"
                                   stroke="currentColor"
@@ -329,10 +337,10 @@ export default function ContestModal({
                                     : "Unknown time"}
                                 </span>
                               </div>
-                              <div className="flex items-center gap-2 text-sm text-white/70">
+                              <div className="flex items-center gap-2 text-xs sm:text-sm text-white/70">
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4 text-white/50"
+                                  className="h-3 w-3 sm:h-4 sm:w-4 text-white/50"
                                   fill="none"
                                   viewBox="0 0 24 24"
                                   stroke="currentColor"
@@ -353,16 +361,16 @@ export default function ContestModal({
 
                             {/* Visit button indicator */}
                             <div
-                              className="mt-3 text-center py-2 rounded-lg bg-white/5 border border-white/10 group-hover:bg-white/10 transition-all duration-300"
+                              className="mt-2 sm:mt-3 text-center py-1.5 sm:py-2 rounded-lg bg-white/5 border border-white/10 group-hover:bg-white/10 transition-all duration-300"
                               style={{
                                 color: platformColor,
                               }}
                             >
-                              <div className="flex items-center justify-center gap-2 text-sm font-medium">
+                              <div className="flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium">
                                 <span>Visit Official Contest Page</span>
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300"
+                                  className="h-3 w-3 sm:h-4 sm:w-4 group-hover:translate-x-1 transition-transform duration-300"
                                   viewBox="0 0 20 20"
                                   fill="currentColor"
                                 >
@@ -378,7 +386,7 @@ export default function ContestModal({
 
                           {/* Premium arrow button */}
                           <div
-                            className="relative flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center group-hover:scale-110 transition-all duration-300"
+                            className="relative flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center group-hover:scale-110 transition-all duration-300"
                             style={{
                               backgroundColor: `${platformColor}20`,
                               color: platformColor,
@@ -393,7 +401,7 @@ export default function ContestModal({
                             ></div>
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
-                              className="h-4 w-4"
+                              className="h-3 w-3 sm:h-4 sm:w-4"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -413,12 +421,12 @@ export default function ContestModal({
                 </div>
               </>
             ) : (
-              <div className="py-16 text-center">
-                <div className="relative w-20 h-20 mx-auto mb-6">
+              <div className="py-10 sm:py-16 text-center">
+                <div className="relative w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6">
                   <div className="absolute inset-0 rounded-full bg-white/5 animate-pulse"></div>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-20 w-20 mx-auto text-white/20"
+                    className="h-16 w-16 sm:h-20 sm:w-20 mx-auto text-white/20"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -431,10 +439,10 @@ export default function ContestModal({
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-white/80 mb-2">
+                <h3 className="text-lg sm:text-xl font-semibold text-white/80 mb-2">
                   No Contests Scheduled
                 </h3>
-                <p className="text-white/50 max-w-md mx-auto">
+                <p className="text-sm text-white/50 max-w-md mx-auto">
                   There are no coding contests scheduled for this date. Check
                   other dates or come back later.
                 </p>
@@ -447,7 +455,8 @@ export default function ContestModal({
       {/* Custom scrollbar styles */}
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {
-          width: 10px;
+          width: 6px;
+          height: 6px;
         }
 
         .custom-scrollbar::-webkit-scrollbar-track {
@@ -462,6 +471,14 @@ export default function ContestModal({
 
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: rgba(139, 92, 246, 0.5);
+        }
+
+        /* Mobile optimization */
+        @media (max-width: 640px) {
+          .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+          }
         }
       `}</style>
     </div>
