@@ -79,6 +79,7 @@ export default function ContestCard({
   status,
   isBookmarked = false,
   url,
+  isHighlighted = false,
 }) {
   const [timeLeft, setTimeLeft] = useState(formatTimeLeft(startTime, status));
   const [bookmarked, setBookmarked] = useState(isBookmarked);
@@ -233,7 +234,24 @@ export default function ContestCard({
         status === "past" ? "opacity-90" : "opacity-100"
       } ${platformStyle.border} ${
         platformStyle.hover
-      } backdrop-blur-sm transition-all duration-300 hover:translate-y-[-2px] hover:shadow-xl`}
+      } backdrop-blur-sm transition-all duration-300 hover:translate-y-[-2px] hover:shadow-xl ${
+        isHighlighted
+          ? "ring-2 ring-offset-2 ring-offset-[#1a1b1e] animate-pulse"
+          : ""
+      }`}
+      style={
+        isHighlighted
+          ? {
+              boxShadow: `0 0 15px ${
+                platform === "LeetCode" || platform === "leetcode"
+                  ? "#FFA116"
+                  : platform === "Codeforces" || platform === "codeforces"
+                  ? "#318CE7"
+                  : "#1FA34B"
+              }`,
+            }
+          : {}
+      }
     >
       <div className="p-5 space-y-4">
         {/* Header */}

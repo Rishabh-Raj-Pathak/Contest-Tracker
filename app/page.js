@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import FilterSection from "./components/FilterSection";
 import ContestCard from "./components/ContestCard";
 import { getCodeforcesContests } from "./lib/api/codeforces";
@@ -11,6 +12,7 @@ import {
 } from "./lib/bookmarkStorage";
 
 export default function Home() {
+  const searchParams = useSearchParams();
   const [codeforcesContests, setCodeforcesContests] = useState([]);
   const [leetcodeContests, setLeetcodeContests] = useState([]);
   const [codechefContests, setCodechefContests] = useState([]);
@@ -21,6 +23,21 @@ export default function Home() {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [bookmarkedOnly, setBookmarkedOnly] = useState(false);
   const [bookmarkedContests, setBookmarkedContests] = useState([]);
+  const [highlightedContest, setHighlightedContest] = useState(null);
+
+  // Handle URL parameters when navigating from calendar
+  useEffect(() => {
+    const platform = searchParams.get("platform");
+    const highlight = searchParams.get("highlight");
+
+    if (platform) {
+      setSelectedPlatforms([platform]);
+    }
+
+    if (highlight) {
+      setHighlightedContest(decodeURIComponent(highlight));
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     // Load bookmarked contests from localStorage
@@ -340,7 +357,11 @@ export default function Home() {
           // Contest Cards Grid
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
             {allFilteredContests.map((contest, index) => (
-              <ContestCard key={`contest-${index}`} {...contest} />
+              <ContestCard
+                key={`contest-${index}`}
+                {...contest}
+                isHighlighted={highlightedContest === contest.title}
+              />
             ))}
           </div>
         ) : (

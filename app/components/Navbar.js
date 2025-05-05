@@ -88,7 +88,7 @@ export default function Navbar() {
                   <span>Contests</span>
                 </Link>
 
-                <Link
+                {/* <Link
                   href="/calendar"
                   className={`
                     px-4 sm:px-6 py-2 rounded-full font-medium
@@ -109,7 +109,7 @@ export default function Navbar() {
                     />
                   </svg>
                   <span>Calendar</span>
-                </Link>
+                </Link> */}
               </div>
             </div>
 
