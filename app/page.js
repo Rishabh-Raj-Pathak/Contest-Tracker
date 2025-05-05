@@ -277,8 +277,8 @@ export default function Home() {
   };
 
   return (
-    <div className="flex gap-8">
-      {/* Left Sidebar - Filter Section */}
+    <div className="flex flex-col lg:flex-row gap-8">
+      {/* Left Sidebar - Filter Section (Desktop) */}
       <aside className="hidden lg:block sticky top-24 h-fit">
         <FilterSection
           selectedPlatforms={selectedPlatforms}
@@ -288,11 +288,26 @@ export default function Home() {
           bookmarkedOnly={bookmarkedOnly}
           setBookmarkedOnly={setBookmarkedOnly}
           showDisclaimer={true}
+          isCompact={false}
         />
       </aside>
 
       {/* Main Content */}
       <div className="flex-1 space-y-6">
+        {/* Mobile Filter Section */}
+        <div className="lg:hidden mb-6">
+          <FilterSection
+            selectedPlatforms={selectedPlatforms}
+            setSelectedPlatforms={setSelectedPlatforms}
+            selectedStatus={selectedStatus}
+            setSelectedStatus={setSelectedStatus}
+            bookmarkedOnly={bookmarkedOnly}
+            setBookmarkedOnly={setBookmarkedOnly}
+            showDisclaimer={true}
+            isCompact={true}
+          />
+        </div>
+
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-white/90">
             {getStatusText()}

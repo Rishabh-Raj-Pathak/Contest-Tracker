@@ -1,9 +1,11 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const isActiveTab = (path) => {
     return pathname === path
@@ -12,29 +14,61 @@ export default function Navbar() {
   };
 
   return (
-    <div className="w-full fixed top-0 z-50 px-4 py-3">
+    <div className="w-full fixed top-0 z-50 px-2 sm:px-4 py-3">
       <nav className="max-w-7xl mx-auto rounded-2xl bg-[#1a1b1e]/95 shadow-xl border border-white/[0.05]">
-        <div className="px-6">
+        <div className="px-3 sm:px-6">
           <div className="h-14 flex items-center justify-between">
             {/* Logo Section */}
             <div className="flex-shrink-0">
               <Link href="/" className="flex items-center">
-                <span className="font-bold text-2xl tracking-tight text-blue-300">
+                <span className="font-bold text-xl sm:text-2xl tracking-tight text-blue-300">
                   CP
                 </span>
-                <span className="font-bold text-2xl tracking-tight text-white">
+                <span className="font-bold text-xl sm:text-2xl tracking-tight text-white">
                   -Track
                 </span>
               </Link>
             </div>
 
-            {/* Center Navigation */}
-            <div className="flex-1 flex justify-center space-x-4">
+            {/* Hamburger Menu for XS screens */}
+            <div className="flex sm:hidden">
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="p-2 rounded-lg bg-black/30 hover:bg-white/10 transition-all duration-200 backdrop-blur-sm"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 text-white/90"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  {menuOpen ? (
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  ) : (
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 6h16M4 12h16M4 18h16"
+                    />
+                  )}
+                </svg>
+              </button>
+            </div>
+
+            {/* Center Navigation - Hidden on XS, visible on SM and above */}
+            <div className="hidden sm:flex flex-1 justify-center space-x-4">
               <div className="bg-black/30 rounded-full p-1 flex items-center backdrop-blur-sm">
                 <Link
                   href="/"
                   className={`
-                    px-6 py-2 rounded-full font-medium
+                    px-4 sm:px-6 py-2 rounded-full font-medium
                     transition-all duration-200 flex items-center gap-2
                     ${isActiveTab("/")}
                   `}
@@ -57,7 +91,7 @@ export default function Navbar() {
                 <Link
                   href="/calendar"
                   className={`
-                    px-6 py-2 rounded-full font-medium
+                    px-4 sm:px-6 py-2 rounded-full font-medium
                     transition-all duration-200 flex items-center gap-2
                     ${isActiveTab("/calendar")}
                   `}
@@ -80,7 +114,7 @@ export default function Navbar() {
             </div>
 
             {/* Right Section - Avatar */}
-            <div className="flex-shrink-0">
+            <div className="hidden sm:flex flex-shrink-0">
               <button className="flex items-center justify-center h-10 w-10 rounded-full bg-black/30 hover:bg-white/10 transition-all duration-200 backdrop-blur-sm">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -97,6 +131,61 @@ export default function Navbar() {
               </button>
             </div>
           </div>
+
+          {/* Mobile Menu - Expanded when menuOpen is true */}
+          {menuOpen && (
+            <div className="sm:hidden py-3 border-t border-white/[0.05] mt-2">
+              <div className="flex flex-col space-y-2">
+                <Link
+                  href="/"
+                  className={`
+                    px-4 py-2 rounded-lg font-medium
+                    transition-all duration-200 flex items-center gap-2
+                    ${isActiveTab("/")}
+                  `}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>Contests</span>
+                </Link>
+
+                <Link
+                  href="/calendar"
+                  className={`
+                    px-4 py-2 rounded-lg font-medium
+                    transition-all duration-200 flex items-center gap-2
+                    ${isActiveTab("/calendar")}
+                  `}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>Calendar</span>
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </nav>
     </div>
