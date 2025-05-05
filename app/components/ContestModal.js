@@ -90,7 +90,7 @@ export default function ContestModal({
 
   // Filter contests for the selected date
   const dateContests = contests.filter((contest) => {
-    if (!contest.startTime) return false;
+    if (!contest || !contest.startTime) return false;
 
     const contestDate = new Date(contest.startTime);
     const selectedDate = new Date(date);
@@ -248,9 +248,9 @@ export default function ContestModal({
 
                           <div className="flex-1 space-y-3">
                             {/* Top badges row */}
-                            <div className="flex flex-wrap items-center gap-2">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <span
-                                className="px-3 py-1 rounded-full text-xs font-semibold"
+                                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                                 style={{
                                   backgroundColor: `${platformColor}20`,
                                   color: platformColor,
@@ -258,22 +258,45 @@ export default function ContestModal({
                               >
                                 {contest.platform}
                               </span>
+
                               <span
-                                className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                  contest.status === "upcoming"
-                                    ? "bg-green-500/20 text-green-400"
-                                    : contest.status === "ongoing"
-                                    ? "bg-red-500/20 text-red-400"
-                                    : "bg-yellow-500/20 text-yellow-400"
+                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                  contest.status === "ongoing"
+                                    ? "bg-red-100 text-red-800"
+                                    : contest.status === "upcoming"
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-gray-100 text-gray-800"
                                 }`}
                               >
-                                {contest.status}
+                                {contest.status === "ongoing"
+                                  ? "Live"
+                                  : contest.status === "upcoming"
+                                  ? "Upcoming"
+                                  : "Past"}
                               </span>
+
+                              {contest.duration && (
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/10 text-white/70">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-3 w-3 mr-1"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                  {contest.duration}
+                                </span>
+                              )}
                             </div>
 
-                            {/* Title with fancy hover effect */}
-                            <h3 className="text-lg font-medium text-white group-hover:text-white transition-colors duration-300">
-                              {contest.title || contest.name}
+                            {/* Title */}
+                            <h3 className="text-lg font-semibold text-white group-hover:text-white transition-colors">
+                              {contest.title}
                             </h3>
 
                             {/* Time and Duration in a styled box */}
@@ -340,15 +363,13 @@ export default function ContestModal({
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
                                   className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
                                 >
                                   <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                    fillRule="evenodd"
+                                    d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+                                    clipRule="evenodd"
                                   />
                                 </svg>
                               </div>

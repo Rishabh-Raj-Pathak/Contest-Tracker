@@ -7,6 +7,10 @@ import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
 import { useRouter } from "next/navigation";
 import ContestModal from "../components/ContestModal";
+// Import the same fetching functions used in the main page
+import { getCodeforcesContests } from "../lib/api/codeforces";
+import { getLeetCodeContests } from "../lib/api/leetcode";
+import { isContestBookmarked } from "../lib/bookmarkStorage";
 
 export default function CalendarPage() {
   const router = useRouter();
@@ -17,40 +21,60 @@ export default function CalendarPage() {
   const [calendarView, setCalendarView] = useState("dayGridMonth");
   const [debugInfo, setDebugInfo] = useState({ loaded: false, count: 0 });
 
-  // Fetch contest data
+  // State for platform-specific contests, same as in the main page
+  const [codeforcesContests, setCodeforcesContests] = useState([]);
+  const [leetcodeContests, setLeetcodeContests] = useState([]);
+  const [codechefContests, setCodechefContests] = useState([]);
+  const [loadingCodeforces, setLoadingCodeforces] = useState(true);
+  const [loadingLeetcode, setLoadingLeetcode] = useState(true);
+  const [loadingCodechef, setLoadingCodechef] = useState(true);
+
+  // Fetch contest data - updated to match the main page's approach
   useEffect(() => {
     async function fetchContests() {
       setLoading(true);
+
+      // Fetch Codeforces contests (using the same function as main page)
       try {
-        // Fetch CodeForces contests
-        const cfResponse = await fetch("/api/contests/codeforces");
-        if (!cfResponse.ok) {
-          throw new Error(
-            `Failed to fetch Codeforces contests: ${cfResponse.status}`
-          );
-        }
-        const cfData = await cfResponse.json();
-        console.log("Fetched Codeforces contests:", cfData.length);
-        const cfContests = cfData.map((contest) => ({
+        setLoadingCodeforces(true);
+        const cfContests = await getCodeforcesContests();
+
+        // Apply bookmark status to each contest
+        const cfContestsWithBookmarks = cfContests.map((contest) => ({
           ...contest,
-          platform: "Codeforces",
+          isBookmarked: isContestBookmarked(contest),
         }));
 
-        // Fetch LeetCode contests
-        const lcResponse = await fetch("/api/contests/leetcode");
-        if (!lcResponse.ok) {
-          throw new Error(
-            `Failed to fetch LeetCode contests: ${lcResponse.status}`
-          );
-        }
-        const lcData = await lcResponse.json();
-        console.log("Fetched LeetCode contests:", lcData.length);
-        const lcContests = lcData.map((contest) => ({
+        setCodeforcesContests(cfContestsWithBookmarks);
+        console.log(`Loaded ${cfContests.length} Codeforces contests`);
+      } catch (error) {
+        console.error("Error fetching Codeforces contests:", error);
+      } finally {
+        setLoadingCodeforces(false);
+      }
+
+      // Fetch LeetCode contests (using the same function as main page)
+      try {
+        setLoadingLeetcode(true);
+        const lcContests = await getLeetCodeContests();
+
+        // Apply bookmark status to each contest
+        const lcContestsWithBookmarks = lcContests.map((contest) => ({
           ...contest,
-          platform: "LeetCode",
+          isBookmarked: isContestBookmarked(contest),
         }));
 
-        // Fetch CodeChef contests
+        setLeetcodeContests(lcContestsWithBookmarks);
+        console.log(`Loaded ${lcContests.length} LeetCode contests`);
+      } catch (error) {
+        console.error("Error fetching LeetCode contests:", error);
+      } finally {
+        setLoadingLeetcode(false);
+      }
+
+      // Fetch CodeChef contests
+      try {
+        setLoadingCodechef(true);
         const ccResponse = await fetch("/api/contests/codechef");
         if (!ccResponse.ok) {
           throw new Error(
@@ -59,87 +83,114 @@ export default function CalendarPage() {
         }
         const ccData = await ccResponse.json();
         console.log("Fetched CodeChef data:", ccData);
+
+        // Format CodeChef contests the same way as in the main page
         const ccContests = [
           ...(ccData.upcoming || []).map((contest) => ({
             ...contest,
             platform: "CodeChef",
+            title: contest.name,
+            duration: contest.duration || "2h 30m",
             status: "upcoming",
           })),
           ...(ccData.past30Days || []).map((contest) => ({
             ...contest,
             platform: "CodeChef",
+            title: contest.name,
+            duration: contest.duration || "2h 30m",
             status: "past",
           })),
         ];
 
-        // Check for empty arrays or null values
-        if (!cfContests.length && !lcContests.length && !ccContests.length) {
-          console.warn("Warning: All contest sources returned empty arrays");
-        }
+        // Apply bookmark status to each contest
+        const ccContestsWithBookmarks = ccContests.map((contest) => ({
+          ...contest,
+          isBookmarked: isContestBookmarked(contest),
+        }));
 
-        // Combine all contests
-        const combined = [...cfContests, ...lcContests, ...ccContests];
-        console.log("Combined contests before validation:", combined.length);
-
-        // Validate and log individual contests with issues
-        const validContests = combined.filter((contest) => {
-          if (!contest) {
-            console.warn("Null contest object in results");
-            return false;
-          }
-
-          if (!contest.startTime) {
-            console.warn("Contest missing startTime:", contest);
-            return false;
-          }
-
-          const hasValidStartTime =
-            new Date(contest.startTime).toString() !== "Invalid Date";
-          if (!hasValidStartTime) {
-            console.warn(
-              "Invalid startTime format:",
-              contest.startTime,
-              "for contest:",
-              contest
-            );
-            return false;
-          }
-
-          if (!contest.title && !contest.name) {
-            console.warn("Contest missing title/name:", contest);
-            return false;
-          }
-
-          return true;
-        });
-
-        console.log(
-          `Loaded ${validContests.length} valid contests out of ${combined.length} total`
-        );
-
-        // Log a few sample contests for debugging
-        if (validContests.length > 0) {
-          console.log("Sample contests:", validContests.slice(0, 3));
-        }
-
-        setAllContests(validContests);
-        setDebugInfo({
-          loaded: true,
-          count: validContests.length,
-          cfCount: cfContests.length,
-          lcCount: lcContests.length,
-          ccCount: ccContests.length,
-        });
+        setCodechefContests(ccContestsWithBookmarks);
+        console.log(`Loaded ${ccContests.length} CodeChef contests`);
       } catch (error) {
-        console.error("Error fetching contest data:", error);
-        setDebugInfo({ loaded: true, count: 0, error: error.message });
+        console.error("Error fetching CodeChef contests:", error);
       } finally {
+        setLoadingCodechef(false);
         setLoading(false);
       }
     }
 
     fetchContests();
   }, []);
+
+  // Separate useEffect to combine contests once they're all loaded
+  useEffect(() => {
+    // Only combine when all platforms are done loading
+    if (!loadingCodeforces && !loadingLeetcode && !loadingCodechef) {
+      const combined = [
+        ...codeforcesContests,
+        ...leetcodeContests,
+        ...codechefContests,
+      ];
+
+      console.log("Combined contests before validation:", combined.length);
+
+      // Validate and log individual contests with issues
+      const validContests = combined.filter((contest) => {
+        if (!contest) {
+          console.warn("Null contest object in results");
+          return false;
+        }
+
+        if (!contest.startTime) {
+          console.warn("Contest missing startTime:", contest);
+          return false;
+        }
+
+        const hasValidStartTime =
+          new Date(contest.startTime).toString() !== "Invalid Date";
+        if (!hasValidStartTime) {
+          console.warn(
+            "Invalid startTime format:",
+            contest.startTime,
+            "for contest:",
+            contest
+          );
+          return false;
+        }
+
+        if (!contest.title && !contest.name) {
+          console.warn("Contest missing title/name:", contest);
+          return false;
+        }
+
+        return true;
+      });
+
+      console.log(
+        `Loaded ${validContests.length} valid contests out of ${combined.length} total`
+      );
+
+      // Log a few sample contests for debugging
+      if (validContests.length > 0) {
+        console.log("Sample contests:", validContests.slice(0, 3));
+      }
+
+      setAllContests(validContests);
+      setDebugInfo({
+        loaded: true,
+        count: validContests.length,
+        cfCount: codeforcesContests.length,
+        lcCount: leetcodeContests.length,
+        ccCount: codechefContests.length,
+      });
+    }
+  }, [
+    codeforcesContests,
+    leetcodeContests,
+    codechefContests,
+    loadingCodeforces,
+    loadingLeetcode,
+    loadingCodechef,
+  ]);
 
   // Transform contests into calendar events
   const events = allContests
@@ -206,8 +257,8 @@ export default function CalendarPage() {
         }
       }
 
-      // Use title or name (CodeChef events use 'name' instead of 'title')
-      const title = contest.title || contest.name || "Unnamed Contest";
+      // Use title property (CodeChef events should now have title property set)
+      const title = contest.title || "Unnamed Contest";
 
       // Create event object
       return {
@@ -251,16 +302,22 @@ export default function CalendarPage() {
       originalData: eventData,
     });
 
+    // Always open modal to show details
     setModalOpen(true);
   };
 
-  // Handle calendar view change
+  // Handle view change
   const handleViewChange = (viewInfo) => {
     setCalendarView(viewInfo.view.type);
   };
 
   // Handle contest click in modal
   const handleContestClick = (contest) => {
+    // Close the modal
+    setModalOpen(false);
+
+    console.log("Contest clicked:", contest);
+
     // Redirect to the official contest URL
     if (contest.url) {
       window.open(contest.url, "_blank");
@@ -480,6 +537,10 @@ export default function CalendarPage() {
                           : "#FCD34D"
                       }"></span>
                       ${info.event.extendedProps.status || "Unknown status"}
+                    </div>
+                    <div class="tooltip-link">
+                      <span class="link-icon">🔍</span>
+                      Click for detailed contest view
                     </div>
                   `;
 
@@ -887,6 +948,27 @@ export default function CalendarPage() {
 
         .tooltip-time,
         .tooltip-status {
+          font-size: 0.85rem;
+          color: rgba(255, 255, 255, 0.7);
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-top: 4px;
+        }
+
+        .tooltip-link {
+          font-size: 0.85rem;
+          color: rgba(139, 92, 246, 0.9);
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-top: 8px;
+          padding-top: 8px;
+          border-top: 1px dashed rgba(255, 255, 255, 0.1);
+          font-weight: 500;
+        }
+
+        .tooltip-duration {
           font-size: 0.85rem;
           color: rgba(255, 255, 255, 0.7);
           display: flex;
