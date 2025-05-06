@@ -79,7 +79,7 @@ export default function FilterSection({
   // Render compact version for mobile
   if (isCompact) {
     return (
-      <div className="rounded-2xl bg-[#1a1b1e]/95 shadow-xl border border-white/[0.05] p-3 space-y-3 backdrop-blur-sm">
+      <div className="rounded-2xl bg-[#1a1b1e]/95 shadow-xl border border-white/[0.05] p-3 space-y-3 backdrop-blur-sm transition-all duration-300 hover:border-white/10">
         {/* Compact Header */}
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -99,7 +99,8 @@ export default function FilterSection({
           </div>
           <button
             onClick={() => setShowCompactFilters(!showCompactFilters)}
-            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-all"
+            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-all active:scale-95"
+            aria-label={showCompactFilters ? "Hide filters" : "Show filters"}
           >
             {showCompactFilters ? (
               <svg
@@ -133,16 +134,16 @@ export default function FilterSection({
 
         {/* Compact Filters */}
         {showCompactFilters && (
-          <div className="space-y-3 py-1">
-            {/* Platforms (Horizontal Scrollable) */}
+          <div className="space-y-3 py-1 animate-fadeIn">
+            {/* Platforms (Wrapping Grid) */}
             <div className="space-y-2">
               <h3 className="text-xs font-medium text-white/70">Platforms</h3>
-              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+              <div className="flex flex-wrap gap-2">
                 {platforms.map((platform) => (
                   <button
                     key={platform.name}
                     onClick={() => togglePlatform(platform.name)}
-                    className={`flex-shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-all duration-200 border ${
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-all duration-200 border active:scale-95 ${
                       selectedPlatforms.includes(platform.name)
                         ? getPlatformActiveClass(platform.name)
                         : `border-transparent ${getPlatformHoverClass(
@@ -171,23 +172,23 @@ export default function FilterSection({
               </div>
             </div>
 
-            {/* Status (Horizontal Scrollable) */}
+            {/* Status (Wrapping Grid) */}
             <div className="space-y-2">
               <h3 className="text-xs font-medium text-white/70">Status</h3>
-              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+              <div className="flex flex-wrap gap-2">
                 {statusOptions.map((option) => (
                   <button
                     key={option.id}
                     onClick={() => setSelectedStatus(option.id)}
-                    className={`flex-shrink-0 px-3 py-1 rounded-full text-xs transition-all duration-200 ${
+                    className={`px-3 py-1 rounded-full text-xs transition-all duration-200 active:scale-95 ${
                       selectedStatus === option.id
                         ? option.id === "ongoing"
-                          ? "bg-red-500/20 text-red-400"
+                          ? "bg-red-500/20 text-red-400 ring-1 ring-red-500/20"
                           : option.id === "upcoming"
-                          ? "bg-green-500/20 text-green-400"
+                          ? "bg-green-500/20 text-green-400 ring-1 ring-green-500/20"
                           : option.id === "past"
-                          ? "bg-yellow-500/20 text-yellow-400"
-                          : "bg-blue-500/20 text-blue-400"
+                          ? "bg-yellow-500/20 text-yellow-400 ring-1 ring-yellow-500/20"
+                          : "bg-blue-500/20 text-blue-400 ring-1 ring-blue-500/20"
                         : "bg-white/5 text-white/70 hover:bg-white/10"
                     }`}
                   >
@@ -201,9 +202,9 @@ export default function FilterSection({
             <div>
               <button
                 onClick={() => setBookmarkedOnly(!bookmarkedOnly)}
-                className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-200 ${
+                className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all duration-200 active:scale-95 ${
                   bookmarkedOnly
-                    ? "bg-amber-500/20 text-amber-400"
+                    ? "bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/10"
                     : "bg-white/5 text-white/70 hover:bg-white/10"
                 }`}
               >
@@ -231,7 +232,8 @@ export default function FilterSection({
       {/* Mobile Filter Toggle Button */}
       <button
         onClick={() => setIsFilterVisible(!isFilterVisible)}
-        className="fixed bottom-6 right-6 z-50 p-4 rounded-full bg-[#1a1b1e] shadow-xl border border-white/[0.05] lg:hidden flex items-center justify-center"
+        className="fixed bottom-6 right-6 z-50 p-4 rounded-full bg-[#1a1b1e] shadow-xl border border-white/[0.05] lg:hidden flex items-center justify-center hover:bg-[#1a1b1e]/90 transition-all active:scale-95"
+        aria-label="Toggle filters"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -251,10 +253,10 @@ export default function FilterSection({
       <div
         className={`
           fixed lg:relative top-0 right-0 h-full lg:h-auto
-          w-[280px]
+          w-[280px] max-w-[90vw]
           rounded-2xl bg-[#1a1b1e]/95 shadow-xl border border-white/[0.05] 
           p-6 space-y-6 backdrop-blur-sm
-          transition-transform duration-300 z-40
+          transition-all duration-300 z-40
           ${
             isFilterVisible
               ? "translate-x-0"
@@ -265,7 +267,8 @@ export default function FilterSection({
         {/* Close Button for Mobile */}
         <button
           onClick={() => setIsFilterVisible(false)}
-          className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 lg:hidden"
+          className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 lg:hidden hover:bg-white/10 transition-all active:scale-95"
+          aria-label="Close filters"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -306,7 +309,7 @@ export default function FilterSection({
               <button
                 key={platform.name}
                 onClick={() => togglePlatform(platform.name)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 border ${
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 border active:scale-95 ${
                   selectedPlatforms.includes(platform.name)
                     ? getPlatformActiveClass(platform.name)
                     : `border-transparent ${getPlatformHoverClass(
@@ -343,15 +346,15 @@ export default function FilterSection({
               <button
                 key={option.id}
                 onClick={() => setSelectedStatus(option.id)}
-                className={`px-3 py-1 rounded-full text-sm transition-all duration-200 ${
+                className={`px-3 py-1 rounded-full text-sm transition-all duration-200 active:scale-95 ${
                   selectedStatus === option.id
                     ? option.id === "ongoing"
-                      ? "bg-red-500/20 text-red-400"
+                      ? "bg-red-500/20 text-red-400 ring-1 ring-red-500/20"
                       : option.id === "upcoming"
-                      ? "bg-green-500/20 text-green-400"
+                      ? "bg-green-500/20 text-green-400 ring-1 ring-green-500/20"
                       : option.id === "past"
-                      ? "bg-yellow-500/20 text-yellow-400"
-                      : "bg-blue-500/20 text-blue-400"
+                      ? "bg-yellow-500/20 text-yellow-400 ring-1 ring-yellow-500/20"
+                      : "bg-blue-500/20 text-blue-400 ring-1 ring-blue-500/20"
                     : "bg-white/5 text-white/70 hover:bg-white/10"
                 }`}
               >
@@ -365,9 +368,9 @@ export default function FilterSection({
         <div>
           <button
             onClick={() => setBookmarkedOnly(!bookmarkedOnly)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 active:scale-95 ${
               bookmarkedOnly
-                ? "bg-amber-500/20 text-amber-400"
+                ? "bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/10"
                 : "bg-white/5 text-white/70 hover:bg-white/10"
             }`}
           >
