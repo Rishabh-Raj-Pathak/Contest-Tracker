@@ -77,7 +77,7 @@ export function StateProvider({ children }) {
           if (parsedState && parsedState.version === STATE_VERSION) {
             setState(parsedState);
           } else {
-            console.log("Resetting state due to version mismatch");
+            // console.log("Resetting state due to version mismatch");
             localStorage.removeItem("appState");
           }
         }

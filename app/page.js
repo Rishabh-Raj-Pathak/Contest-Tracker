@@ -226,7 +226,7 @@ export default function Home() {
       }));
 
       setCodeforcesContests(cfContestsWithBookmarks);
-      console.log(`Loaded ${cfContests.length} Codeforces contests`);
+      // console.log(`Loaded ${cfContests.length} Codeforces contests`);
     } catch (error) {
       console.error("Error fetching Codeforces contests:", error);
     } finally {
@@ -245,7 +245,7 @@ export default function Home() {
       }));
 
       setLeetcodeContests(lcContestsWithBookmarks);
-      console.log(`Loaded ${lcContests.length} LeetCode contests`);
+      // console.log(`Loaded ${lcContests.length} LeetCode contests`);
     } catch (error) {
       console.error("Error fetching LeetCode contests:", error);
     } finally {
@@ -269,7 +269,7 @@ export default function Home() {
       }
 
       const data = await response.json();
-      console.log("CodeChef data:", data);
+      // console.log("CodeChef data:", data);
 
       // Combine and format contests
       const ccContests = [
@@ -296,7 +296,7 @@ export default function Home() {
       }));
 
       setCodechefContests(ccContestsWithBookmarks);
-      console.log(`Loaded ${ccContests.length} CodeChef contests`);
+      // console.log(`Loaded ${ccContests.length} CodeChef contests`);
     } catch (error) {
       console.error("Error fetching CodeChef contests:", error);
     } finally {

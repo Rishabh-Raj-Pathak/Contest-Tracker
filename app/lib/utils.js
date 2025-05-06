@@ -32,7 +32,7 @@ export function memoizeWithTTL(fn, ttl = 5 * 60 * 1000) {
     const cached = cache.get(key);
 
     if (cached && Date.now() - cached.timestamp < ttl) {
-      console.log("Using cached data for", args);
+      // console.log("Using cached data for", args);
       return cached.value;
     }
 

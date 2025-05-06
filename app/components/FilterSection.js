@@ -170,6 +170,30 @@ export default function FilterSection({
                   </button>
                 ))}
               </div>
+
+              {/* LeetCode Coming Soon Note - Compact */}
+              {platforms.some((p) => p.name === "LeetCode") && (
+                <div className="mt-2 px-2.5 py-2 rounded-lg bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/20 backdrop-blur-sm">
+                  <div className="flex items-start gap-1.5">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 text-amber-400 mt-0.5 flex-shrink-0"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <p className="text-[10px] text-amber-300 leading-tight">
+                      <span className="font-semibold">Coming Soon:</span>{" "}
+                      LeetCode contests will be incorporated in the next update.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Status (Wrapping Grid) */}
@@ -336,6 +360,30 @@ export default function FilterSection({
               </button>
             ))}
           </div>
+
+          {/* LeetCode Coming Soon Note */}
+          {platforms.some((p) => p.name === "LeetCode") && (
+            <div className="mt-2 px-3 py-2 rounded-lg bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/20 backdrop-blur-sm">
+              <div className="flex items-start gap-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 text-amber-400 mt-0.5 flex-shrink-0"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <p className="text-xs text-amber-300 leading-tight">
+                  <span className="font-semibold">Coming Soon:</span> LeetCode
+                  contests will be fully incorporated in the next update.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Status */}

@@ -176,7 +176,7 @@ export default function CalendarPage() {
         }));
 
         setCodeforcesContests(cfContestsWithBookmarks);
-        console.log(`Loaded ${cfContests.length} Codeforces contests`);
+        // console.log(`Loaded ${cfContests.length} Codeforces contests`);
       } catch (error) {
         console.error("Error fetching Codeforces contests:", error);
       } finally {
@@ -195,7 +195,7 @@ export default function CalendarPage() {
         }));
 
         setLeetcodeContests(lcContestsWithBookmarks);
-        console.log(`Loaded ${lcContests.length} LeetCode contests`);
+        // console.log(`Loaded ${lcContests.length} LeetCode contests`);
       } catch (error) {
         console.error("Error fetching LeetCode contests:", error);
       } finally {
@@ -212,7 +212,7 @@ export default function CalendarPage() {
           );
         }
         const ccData = await ccResponse.json();
-        console.log("Fetched CodeChef data:", ccData);
+        // console.log("Fetched CodeChef data:", ccData);
 
         // Format CodeChef contests the same way as in the main page
         const ccContests = [
@@ -239,7 +239,7 @@ export default function CalendarPage() {
         }));
 
         setCodechefContests(ccContestsWithBookmarks);
-        console.log(`Loaded ${ccContests.length} CodeChef contests`);
+        // console.log(`Loaded ${ccContests.length} CodeChef contests`);
       } catch (error) {
         console.error("Error fetching CodeChef contests:", error);
       } finally {
@@ -271,7 +271,7 @@ export default function CalendarPage() {
         ...codechefContests,
       ];
 
-      console.log("Combined contests before validation:", combined.length);
+      // console.log("Combined contests before validation:", combined.length);
 
       // Validate and log individual contests with issues
       const validContests = combined.filter((contest) => {
@@ -305,13 +305,13 @@ export default function CalendarPage() {
         return true;
       });
 
-      console.log(
-        `Loaded ${validContests.length} valid contests out of ${combined.length} total`
-      );
+      // console.log(
+      //   `Loaded ${validContests.length} valid contests out of ${combined.length} total`
+      // );
 
       // Log a few sample contests for debugging
       if (validContests.length > 0) {
-        console.log("Sample contests:", validContests.slice(0, 3));
+        // console.log("Sample contests:", validContests.slice(0, 3));
       }
 
       setAllContests(validContests);
@@ -435,6 +435,10 @@ export default function CalendarPage() {
 
   // Handle date click
   const handleDateClick = (info) => {
+    // console.log("Clicked event:", {
+    //   date: info.date,
+    //   view: info.view.type,
+    // });
     // Remove any tooltips when opening the modal
     removeAllTooltips();
 
@@ -453,12 +457,12 @@ export default function CalendarPage() {
 
     // Extract and log the event details for debugging
     const eventData = info.event.extendedProps.originalData;
-    console.log("Clicked event:", {
-      title: info.event.title,
-      platform: info.event.extendedProps.platform,
-      start: eventDate.toISOString(),
-      originalData: eventData,
-    });
+    // console.log("Clicked event:", {
+    //   title: info.event.title,
+    //   platform: info.event.extendedProps.platform,
+    //   start: eventDate.toISOString(),
+    //   originalData: eventData,
+    // });
 
     // Always open modal to show details
     setModalOpen(true);
@@ -466,10 +470,9 @@ export default function CalendarPage() {
 
   // Handle contest click in modal
   const handleContestClick = (contest) => {
+    // console.log("Contest clicked:", contest);
     // Close the modal
     setModalOpen(false);
-
-    console.log("Contest clicked:", contest);
 
     // Redirect to the official contest URL
     if (contest.url) {
@@ -638,114 +641,115 @@ export default function CalendarPage() {
                 </div>
               )}
 
-              <FullCalendar
-                plugins={[dayGridPlugin, interactionPlugin]}
-                initialView="dayGridMonth"
-                headerToolbar={{
-                  left:
-                    window.innerWidth < 640 ? "prev,next" : "prev,next today",
-                  center: "title",
-                  right: "dayGridMonth",
-                }}
-                events={events}
-                eventClick={handleEventClick}
-                dateClick={handleDateClick}
-                height={window.innerWidth < 768 ? 600 : 800}
-                themeSystem="standard"
-                dayMaxEvents={window.innerWidth < 768 ? 2 : 3}
-                eventTimeFormat={{
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: true,
-                }}
-                // Mobile optimization
-                stickyHeaderDates={true}
-                className="contest-calendar"
-                // Misc options
-                nowIndicator={true}
-                eventDisplay="auto"
-                displayEventTime={true}
-                displayEventEnd={false}
-                slotMinTime="00:00:00"
-                slotMaxTime="24:00:00"
-                eventDidMount={(info) => {
-                  // Don't create tooltips if modal is open
-                  if (modalOpen) return;
-
-                  // Create tooltip element
-                  const tooltip = document.createElement("div");
-                  tooltip.className = "contest-tooltip";
-                  tooltip.style.position = "absolute";
-                  tooltip.style.display = "none";
-                  tooltip.style.zIndex = "10"; // Lower z-index than modal (50)
-                  tooltip.style.backgroundColor = "rgba(26, 27, 30, 0.95)";
-                  tooltip.style.color = "#fff";
-                  tooltip.style.padding = "12px";
-                  tooltip.style.borderRadius = "12px";
-                  tooltip.style.boxShadow = "0 8px 32px rgba(0, 0, 0, 0.3)";
-                  tooltip.style.fontSize = "0.875rem";
-                  tooltip.style.maxWidth = "300px";
-                  tooltip.style.backdropFilter = "blur(10px)";
-                  tooltip.style.border = "1px solid rgba(255, 255, 255, 0.1)";
-                  tooltip.style.transition = "opacity 0.2s ease-in-out";
-                  tooltip.innerHTML = `
-                    <div class="tooltip-title" style="font-weight: 600; margin-bottom: 6px;">${
-                      info.event.title
-                    }</div>
-                    <div class="tooltip-platform" style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                      <span style="font-weight: 500;">${
-                        info.event.extendedProps.platform
-                      }</span>
-                    </div>
-                    <div class="tooltip-time" style="margin-bottom: 4px;">
-                      <span>Start: ${new Date(
-                        info.event.start
-                      ).toLocaleString()}</span>
-                    </div>
-                    <div class="tooltip-duration" style="margin-bottom: 4px;">
-                      <span>Duration: ${
-                        info.event.extendedProps.duration
-                      }</span>
-                    </div>
-                    <div class="tooltip-status" style="display: flex; align-items: center; gap: 6px;">
-                      <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: ${
-                        info.event.extendedProps.status === "upcoming"
-                          ? "#10B981"
-                          : info.event.extendedProps.status === "ongoing"
-                          ? "#EF4444"
-                          : "#FCD34D"
-                      }"></span>
-                      ${info.event.extendedProps.status || "Unknown status"}
-                    </div>
-                  `;
-
-                  // Append tooltip to body
-                  document.body.appendChild(tooltip);
-
-                  // Show/hide tooltip on mouseover/mouseout
-                  info.el.addEventListener("mouseover", () => {
-                    // Don't show tooltip if modal is open
+              <div className="contest-calendar">
+                <FullCalendar
+                  plugins={[dayGridPlugin, interactionPlugin]}
+                  initialView="dayGridMonth"
+                  headerToolbar={{
+                    left:
+                      window.innerWidth < 640 ? "prev,next" : "prev,next today",
+                    center: "title",
+                    right: "dayGridMonth",
+                  }}
+                  events={events}
+                  eventClick={handleEventClick}
+                  dateClick={handleDateClick}
+                  height={window.innerWidth < 768 ? 600 : 800}
+                  themeSystem="standard"
+                  dayMaxEvents={window.innerWidth < 768 ? 2 : 3}
+                  eventTimeFormat={{
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true,
+                  }}
+                  // Mobile optimization
+                  stickyHeaderDates={true}
+                  // Misc options
+                  nowIndicator={true}
+                  eventDisplay="auto"
+                  displayEventTime={true}
+                  displayEventEnd={false}
+                  slotMinTime="00:00:00"
+                  slotMaxTime="24:00:00"
+                  eventDidMount={(info) => {
+                    // Don't create tooltips if modal is open
                     if (modalOpen) return;
 
-                    const rect = info.el.getBoundingClientRect();
-                    tooltip.style.display = "block";
-                    tooltip.style.left = rect.left + window.scrollX + "px";
-                    tooltip.style.top = rect.bottom + window.scrollY + "px";
-                  });
-
-                  info.el.addEventListener("mouseout", () => {
+                    // Create tooltip element
+                    const tooltip = document.createElement("div");
+                    tooltip.className = "contest-tooltip";
+                    tooltip.style.position = "absolute";
                     tooltip.style.display = "none";
-                  });
+                    tooltip.style.zIndex = "10"; // Lower z-index than modal (50)
+                    tooltip.style.backgroundColor = "rgba(26, 27, 30, 0.95)";
+                    tooltip.style.color = "#fff";
+                    tooltip.style.padding = "12px";
+                    tooltip.style.borderRadius = "12px";
+                    tooltip.style.boxShadow = "0 8px 32px rgba(0, 0, 0, 0.3)";
+                    tooltip.style.fontSize = "0.875rem";
+                    tooltip.style.maxWidth = "300px";
+                    tooltip.style.backdropFilter = "blur(10px)";
+                    tooltip.style.border = "1px solid rgba(255, 255, 255, 0.1)";
+                    tooltip.style.transition = "opacity 0.2s ease-in-out";
+                    tooltip.innerHTML = `
+                      <div class="tooltip-title" style="font-weight: 600; margin-bottom: 6px;">${
+                        info.event.title
+                      }</div>
+                      <div class="tooltip-platform" style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                        <span style="font-weight: 500;">${
+                          info.event.extendedProps.platform
+                        }</span>
+                      </div>
+                      <div class="tooltip-time" style="margin-bottom: 4px;">
+                        <span>Start: ${new Date(
+                          info.event.start
+                        ).toLocaleString()}</span>
+                      </div>
+                      <div class="tooltip-duration" style="margin-bottom: 4px;">
+                        <span>Duration: ${
+                          info.event.extendedProps.duration
+                        }</span>
+                      </div>
+                      <div class="tooltip-status" style="display: flex; align-items: center; gap: 6px;">
+                        <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: ${
+                          info.event.extendedProps.status === "upcoming"
+                            ? "#10B981"
+                            : info.event.extendedProps.status === "ongoing"
+                            ? "#EF4444"
+                            : "#FCD34D"
+                        }"></span>
+                        ${info.event.extendedProps.status || "Unknown status"}
+                      </div>
+                    `;
 
-                  // Clean up on event unmount
-                  info.event.remove = () => {
-                    if (document.body.contains(tooltip)) {
-                      document.body.removeChild(tooltip);
-                    }
-                  };
-                }}
-                moreLinkClick="popover"
-              />
+                    // Append tooltip to body
+                    document.body.appendChild(tooltip);
+
+                    // Show/hide tooltip on mouseover/mouseout
+                    info.el.addEventListener("mouseover", () => {
+                      // Don't show tooltip if modal is open
+                      if (modalOpen) return;
+
+                      const rect = info.el.getBoundingClientRect();
+                      tooltip.style.display = "block";
+                      tooltip.style.left = rect.left + window.scrollX + "px";
+                      tooltip.style.top = rect.bottom + window.scrollY + "px";
+                    });
+
+                    info.el.addEventListener("mouseout", () => {
+                      tooltip.style.display = "none";
+                    });
+
+                    // Clean up on event unmount
+                    info.event.remove = () => {
+                      if (document.body.contains(tooltip)) {
+                        document.body.removeChild(tooltip);
+                      }
+                    };
+                  }}
+                  moreLinkClick="popover"
+                />
+              </div>
             </>
           )}
         </div>

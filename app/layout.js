@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import SchedulerInitializer from "./components/SchedulerInitializer";
 import { StateProvider } from "./lib/StateContext";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -36,6 +37,7 @@ export default function RootLayout({ children }) {
             <main className="flex-grow container mx-auto px-4 py-8 mt-20">
               {children}
             </main>
+            <Footer />
           </StateProvider>
         </ErrorBoundary>
       </body>

@@ -36,10 +36,10 @@ const shouldRunScraper = () => {
 // Run the scraper if it's time
 export const runScheduledTasks = async () => {
   if (shouldRunScraper()) {
-    console.log("Running scheduled CodeChef contest scraper...");
+    // console.log("Running scheduled CodeChef contest scraper...");
     await fetchLatestContests();
     lastRunTime = new Date();
-    console.log("Scheduled task completed at", lastRunTime.toISOString());
+    // console.log("Scheduled task completed at", lastRunTime.toISOString());
   }
 };
 
@@ -56,13 +56,13 @@ export const startScheduler = () => {
 
   // Check every hour
   schedulerInterval = setInterval(runScheduledTasks, 60 * 60 * 1000);
-  console.log("Contest scheduler started");
+  // console.log("Contest scheduler started");
 };
 
 export const stopScheduler = () => {
   if (schedulerInterval) {
     clearInterval(schedulerInterval);
     schedulerInterval = null;
-    console.log("Contest scheduler stopped");
+    // console.log("Contest scheduler stopped");
   }
 };
