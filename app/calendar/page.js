@@ -423,14 +423,30 @@ export default function CalendarPage() {
     })
     .filter(Boolean); // Remove any null values
 
+  // Use this function to clean up tooltips
+  const removeAllTooltips = () => {
+    const tooltips = document.querySelectorAll(".contest-tooltip");
+    tooltips.forEach((tooltip) => {
+      if (tooltip && document.body.contains(tooltip)) {
+        document.body.removeChild(tooltip);
+      }
+    });
+  };
+
   // Handle date click
   const handleDateClick = (info) => {
+    // Remove any tooltips when opening the modal
+    removeAllTooltips();
+
     setSelectedDate(info.date);
     setModalOpen(true);
   };
 
   // Handle event click
   const handleEventClick = (info) => {
+    // Remove any tooltips when opening the modal
+    removeAllTooltips();
+
     // Set the selected date to show modal
     const eventDate = new Date(info.event.start);
     setSelectedDate(eventDate);
@@ -489,15 +505,17 @@ export default function CalendarPage() {
   // Add a cleanup effect to remove any tooltips when unmounting the component
   useEffect(() => {
     return () => {
-      // Remove any tooltips that might be left in the DOM when navigating away
-      const tooltips = document.querySelectorAll(".contest-tooltip");
-      tooltips.forEach((tooltip) => {
-        if (tooltip && document.body.contains(tooltip)) {
-          document.body.removeChild(tooltip);
-        }
-      });
+      // Remove any tooltips when navigating away
+      removeAllTooltips();
     };
   }, []);
+
+  // Add effect to remove tooltips when modal is open
+  useEffect(() => {
+    if (modalOpen) {
+      removeAllTooltips();
+    }
+  }, [modalOpen]);
 
   return (
     <div className="space-y-8 pb-16">
@@ -651,12 +669,15 @@ export default function CalendarPage() {
                 slotMinTime="00:00:00"
                 slotMaxTime="24:00:00"
                 eventDidMount={(info) => {
+                  // Don't create tooltips if modal is open
+                  if (modalOpen) return;
+
                   // Create tooltip element
                   const tooltip = document.createElement("div");
                   tooltip.className = "contest-tooltip";
                   tooltip.style.position = "absolute";
                   tooltip.style.display = "none";
-                  tooltip.style.zIndex = "1000";
+                  tooltip.style.zIndex = "10"; // Lower z-index than modal (50)
                   tooltip.style.backgroundColor = "rgba(26, 27, 30, 0.95)";
                   tooltip.style.color = "#fff";
                   tooltip.style.padding = "12px";
@@ -703,6 +724,9 @@ export default function CalendarPage() {
 
                   // Show/hide tooltip on mouseover/mouseout
                   info.el.addEventListener("mouseover", () => {
+                    // Don't show tooltip if modal is open
+                    if (modalOpen) return;
+
                     const rect = info.el.getBoundingClientRect();
                     tooltip.style.display = "block";
                     tooltip.style.left = rect.left + window.scrollX + "px";

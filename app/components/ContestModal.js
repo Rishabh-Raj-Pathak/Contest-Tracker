@@ -125,6 +125,7 @@ export default function ContestModal({
       className={`fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-md transition-opacity duration-300 ${
         animateIn ? "opacity-100" : "opacity-0"
       }`}
+      style={{ zIndex: 50 }}
     >
       {/* Decorative blurs */}
       <div className="absolute -top-20 -right-40 w-80 h-80 rounded-full bg-purple-500/10 blur-3xl pointer-events-none"></div>

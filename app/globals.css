@@ -225,3 +225,9 @@ main {
   background: rgba(59, 130, 246, 0.5);
   color: white;
 }
+
+/* Hide tooltips when modal is open */
+body:has(.fixed[style*="z-index: 50"]:not([class*="opacity-0"]))
+  .contest-tooltip {
+  display: none !important;
+}
