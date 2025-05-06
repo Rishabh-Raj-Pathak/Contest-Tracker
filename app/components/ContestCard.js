@@ -263,6 +263,9 @@ export default function ContestCard({
                   src={platformStyle.logo}
                   alt={platform}
                   className="w-6 h-6 rounded"
+                  width={24}
+                  height={24}
+                  loading="lazy"
                 />
                 <span
                   className={`px-2 py-1 rounded-lg text-sm ${platformStyle.badge}`}

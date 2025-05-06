@@ -9,25 +9,103 @@ import ContestModal from "../components/ContestModal";
 import { getCodeforcesContests } from "../lib/api/codeforces";
 import { getLeetCodeContests } from "../lib/api/leetcode";
 import { isContestBookmarked } from "../lib/bookmarkStorage";
+import { useAppState } from "../lib/StateContext";
 
 export default function CalendarPage() {
   const router = useRouter();
+
+  // Get state from context
+  const { calendarData, saveCalendarData, calendarNeedRefresh } = useAppState();
+
   const [selectedDate, setSelectedDate] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [allContests, setAllContests] = useState([]);
-  const [debugInfo, setDebugInfo] = useState({ loaded: false, count: 0 });
+  const [loading, setLoading] = useState(!calendarData);
+  const [allContests, setAllContests] = useState(
+    calendarData?.allContests || []
+  );
+  const [debugInfo, setDebugInfo] = useState(
+    calendarData?.debugInfo || { loaded: false, count: 0 }
+  );
 
   // State for platform-specific contests, same as in the main page
-  const [codeforcesContests, setCodeforcesContests] = useState([]);
-  const [leetcodeContests, setLeetcodeContests] = useState([]);
-  const [codechefContests, setCodechefContests] = useState([]);
-  const [loadingCodeforces, setLoadingCodeforces] = useState(true);
-  const [loadingLeetcode, setLoadingLeetcode] = useState(true);
-  const [loadingCodechef, setLoadingCodechef] = useState(true);
+  const [codeforcesContests, setCodeforcesContests] = useState(
+    calendarData?.codeforcesContests || []
+  );
+  const [leetcodeContests, setLeetcodeContests] = useState(
+    calendarData?.leetcodeContests || []
+  );
+  const [codechefContests, setCodechefContests] = useState(
+    calendarData?.codechefContests || []
+  );
+  const [loadingCodeforces, setLoadingCodeforces] = useState(!calendarData);
+  const [loadingLeetcode, setLoadingLeetcode] = useState(!calendarData);
+  const [loadingCodechef, setLoadingCodechef] = useState(!calendarData);
 
   // Use client-side only rendering for date-related elements
   const [formattedDate, setFormattedDate] = useState("");
+
+  // Save state to context when data changes
+  useEffect(() => {
+    // Only save if we have valid data and aren't in the loading state
+    if (!loading && allContests.length > 0) {
+      // Create a clean data object with only what we need
+      // Use a limited subset of data to avoid large localStorage objects
+      const limitedContests = allContests
+        .map((contest) => ({
+          id: contest.id,
+          title: contest.title,
+          platform: contest.platform,
+          startTime: contest.startTime,
+          duration: contest.duration,
+          status: contest.status,
+          url: contest.url,
+        }))
+        .slice(0, 50); // Only cache the first 50 contests
+
+      const stateToSave = {
+        allContests: limitedContests,
+        debugInfo: {
+          loaded: debugInfo.loaded || false,
+          count: debugInfo.count || 0,
+          cfCount: debugInfo.cfCount || 0,
+          lcCount: debugInfo.lcCount || 0,
+          ccCount: debugInfo.ccCount || 0,
+        },
+        // Only save limited contest data for each platform
+        codeforcesContests: codeforcesContests.slice(0, 10).map((c) => ({
+          title: c.title,
+          platform: c.platform,
+          startTime: c.startTime,
+          duration: c.duration,
+          status: c.status,
+        })),
+        leetcodeContests: leetcodeContests.slice(0, 10).map((c) => ({
+          title: c.title,
+          platform: c.platform,
+          startTime: c.startTime,
+          duration: c.duration,
+          status: c.status,
+        })),
+        codechefContests: codechefContests.slice(0, 10).map((c) => ({
+          title: c.title,
+          platform: c.platform,
+          startTime: c.startTime,
+          duration: c.duration,
+          status: c.status,
+        })),
+      };
+
+      saveCalendarData(stateToSave);
+    }
+  }, [
+    allContests,
+    debugInfo,
+    codeforcesContests,
+    leetcodeContests,
+    codechefContests,
+    loading,
+    saveCalendarData,
+  ]);
 
   // Format date in useEffect to avoid hydration mismatch
   useEffect(() => {
@@ -40,10 +118,16 @@ export default function CalendarPage() {
     updateDateDisplay();
   }, []);
 
-  // Fetch contest data - updated to match the main page's approach
+  // Fetch contest data only if we need a refresh
   useEffect(() => {
     async function fetchContests() {
       setLoading(true);
+
+      // Only fetch if we need a refresh
+      if (!calendarNeedRefresh() && calendarData) {
+        setLoading(false);
+        return;
+      }
 
       // Fetch Codeforces contests (using the same function as main page)
       try {
@@ -130,7 +214,17 @@ export default function CalendarPage() {
     }
 
     fetchContests();
-  }, []);
+  }, [
+    calendarNeedRefresh,
+    calendarData,
+    setLoading,
+    setLoadingCodeforces,
+    setLoadingLeetcode,
+    setLoadingCodechef,
+    setCodeforcesContests,
+    setLeetcodeContests,
+    setCodechefContests,
+  ]);
 
   // Separate useEffect to combine contests once they're all loaded
   useEffect(() => {
@@ -201,6 +295,8 @@ export default function CalendarPage() {
     loadingCodeforces,
     loadingLeetcode,
     loadingCodechef,
+    setAllContests,
+    setDebugInfo,
   ]);
 
   // Transform contests into calendar events

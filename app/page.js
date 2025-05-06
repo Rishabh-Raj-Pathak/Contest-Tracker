@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, lazy } from "react";
 import FilterSection from "./components/FilterSection";
 import ContestCard from "./components/ContestCard";
 import LoadingScreen from "./components/LoadingScreen";
@@ -11,20 +11,107 @@ import {
   getBookmarkedContests,
   isContestBookmarked,
 } from "./lib/bookmarkStorage";
+import LazyLoadWrapper from "./components/LazyLoadWrapper";
+import { useAppState } from "./lib/StateContext";
 
 export default function Home() {
-  const [codeforcesContests, setCodeforcesContests] = useState([]);
-  const [leetcodeContests, setLeetcodeContests] = useState([]);
-  const [codechefContests, setCodechefContests] = useState([]);
-  const [loadingCodeforces, setLoadingCodeforces] = useState(true);
-  const [loadingLeetcode, setLoadingLeetcode] = useState(true);
-  const [loadingCodechef, setLoadingCodechef] = useState(true);
-  const [selectedPlatforms, setSelectedPlatforms] = useState([]);
-  const [selectedStatus, setSelectedStatus] = useState("all");
-  const [bookmarkedOnly, setBookmarkedOnly] = useState(false);
-  const [bookmarkedContests, setBookmarkedContests] = useState([]);
+  // Get state from context
+  const { contestsData, saveContestsData, contestsNeedRefresh } = useAppState();
+
+  const [codeforcesContests, setCodeforcesContests] = useState(
+    contestsData?.codeforcesContests || []
+  );
+  const [leetcodeContests, setLeetcodeContests] = useState(
+    contestsData?.leetcodeContests || []
+  );
+  const [codechefContests, setCodechefContests] = useState(
+    contestsData?.codechefContests || []
+  );
+  const [loadingCodeforces, setLoadingCodeforces] = useState(!contestsData);
+  const [loadingLeetcode, setLoadingLeetcode] = useState(!contestsData);
+  const [loadingCodechef, setLoadingCodechef] = useState(!contestsData);
+  const [selectedPlatforms, setSelectedPlatforms] = useState(
+    contestsData?.selectedPlatforms || []
+  );
+  const [selectedStatus, setSelectedStatus] = useState(
+    contestsData?.selectedStatus || "all"
+  );
+  const [bookmarkedOnly, setBookmarkedOnly] = useState(
+    contestsData?.bookmarkedOnly || false
+  );
+  const [bookmarkedContests, setBookmarkedContests] = useState(
+    contestsData?.bookmarkedContests || []
+  );
   const [highlightedContest, setHighlightedContest] = useState(null);
-  const [showLoadingScreen, setShowLoadingScreen] = useState(true);
+  const [showLoadingScreen, setShowLoadingScreen] = useState(!contestsData);
+
+  // Save state to context on changes
+  useEffect(() => {
+    // Only save if we have valid data to save and aren't in the loading state
+    if (
+      !loadingCodeforces &&
+      !loadingLeetcode &&
+      !loadingCodechef &&
+      (codeforcesContests.length > 0 ||
+        leetcodeContests.length > 0 ||
+        codechefContests.length > 0)
+    ) {
+      // Create a clean object with only the essential data we need
+      const stateToSave = {
+        // Only save limited data for each platform to reduce localStorage size
+        codeforcesContests: codeforcesContests.slice(0, 20).map((c) => ({
+          title: c.title,
+          platform: c.platform,
+          startTime: c.startTime,
+          duration: c.duration,
+          status: c.status,
+          url: c.url,
+        })),
+        leetcodeContests: leetcodeContests.slice(0, 20).map((c) => ({
+          title: c.title,
+          platform: c.platform,
+          startTime: c.startTime,
+          duration: c.duration,
+          status: c.status,
+          url: c.url,
+        })),
+        codechefContests: codechefContests.slice(0, 20).map((c) => ({
+          title: c.title,
+          platform: c.platform,
+          startTime: c.startTime,
+          duration: c.duration,
+          status: c.status,
+          url: c.url,
+        })),
+        selectedPlatforms,
+        selectedStatus,
+        bookmarkedOnly,
+        // Only include essential bookmark data
+        bookmarkedContests: bookmarkedContests.slice(0, 20).map((c) => ({
+          title: c.title,
+          platform: c.platform,
+          startTime: c.startTime,
+          duration: c.duration,
+          status: c.status,
+          url: c.url,
+        })),
+      };
+
+      saveContestsData(stateToSave);
+    }
+  }, [
+    codeforcesContests,
+    leetcodeContests,
+    codechefContests,
+    selectedPlatforms,
+    selectedStatus,
+    bookmarkedOnly,
+    bookmarkedContests,
+    loadingCodeforces,
+    loadingLeetcode,
+    loadingCodechef,
+    saveContestsData,
+  ]);
 
   useEffect(() => {
     // Load bookmarked contests from localStorage
@@ -35,8 +122,16 @@ export default function Home() {
       }
     };
 
-    loadBookmarkedContests();
-    fetchContests();
+    // If we have cached data and don't need to refresh, skip loading
+    const needsRefresh = contestsNeedRefresh();
+
+    if (needsRefresh) {
+      loadBookmarkedContests();
+      fetchContests();
+    } else {
+      // We already have cached data, so we don't need to show loading screen
+      setShowLoadingScreen(false);
+    }
 
     // Listen for storage events to update bookmarks when changed in another tab
     const handleStorageChange = (e) => {
@@ -81,16 +176,19 @@ export default function Home() {
       window.removeEventListener("storage", handleStorageChange);
       window.removeEventListener("bookmarkChange", handleBookmarkChange);
     };
-  }, []);
+  }, [contestsNeedRefresh, contestsData]);
 
   // Always show the loading screen for the full animation duration
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowLoadingScreen(false);
-    }, 3500); // Exactly 3.5 seconds
+    // Only set timer if we need to show loading screen
+    if (showLoadingScreen) {
+      const timer = setTimeout(() => {
+        setShowLoadingScreen(false);
+      }, 3000); // Exactly 3 seconds to match the LoadingScreen component
 
-    return () => clearTimeout(timer);
-  }, []);
+      return () => clearTimeout(timer);
+    }
+  }, [showLoadingScreen]);
 
   // Remove the effect that checks if data is loaded
   // This ensures the full animation plays regardless of data loading speed
@@ -370,11 +468,17 @@ export default function Home() {
             // Contest Cards Grid
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
               {allFilteredContests.map((contest, index) => (
-                <ContestCard
+                <LazyLoadWrapper
                   key={`contest-${index}`}
-                  {...contest}
-                  isHighlighted={highlightedContest === contest.title}
-                />
+                  placeholder={
+                    <div className="h-48 rounded-2xl bg-[#1a1b1e]/50 animate-pulse" />
+                  }
+                >
+                  <ContestCard
+                    {...contest}
+                    isHighlighted={highlightedContest === contest.title}
+                  />
+                </LazyLoadWrapper>
               ))}
             </div>
           ) : (

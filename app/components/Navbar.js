@@ -1,16 +1,42 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  // Track if navigation is in progress
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const isActiveTab = (path) => {
     return pathname === path
       ? "bg-white/90 text-gray-900 shadow-sm"
       : "text-white/90 hover:bg-white/10";
+  };
+
+  // Handle navigation with safety checks
+  const handleNavigation = (path) => (e) => {
+    e.preventDefault();
+
+    // Don't navigate to the same page or if navigation is in progress
+    if (pathname === path || isNavigating) return;
+
+    setIsNavigating(true);
+
+    // Close mobile menu
+    setMenuOpen(false);
+
+    // Navigate with small delay to allow menu to close
+    setTimeout(() => {
+      router.push(path);
+
+      // Reset navigation state after a short delay
+      setTimeout(() => {
+        setIsNavigating(false);
+      }, 500);
+    }, 10);
   };
 
   return (
@@ -20,14 +46,18 @@ export default function Navbar() {
           <div className="h-14 flex items-center justify-between">
             {/* Logo Section */}
             <div className="flex-shrink-0">
-              <Link href="/" className="flex items-center">
+              <a
+                href="/"
+                onClick={handleNavigation("/")}
+                className="flex items-center"
+              >
                 <span className="font-bold text-xl sm:text-2xl tracking-tight text-blue-300">
                   CP
                 </span>
                 <span className="font-bold text-xl sm:text-2xl tracking-tight text-white">
                   -Track
                 </span>
-              </Link>
+              </a>
             </div>
 
             {/* Hamburger Menu for XS screens */}
@@ -65,8 +95,9 @@ export default function Navbar() {
             {/* Center Navigation - Hidden on XS, visible on SM and above */}
             <div className="hidden sm:flex flex-1 justify-center space-x-4">
               <div className="bg-black/30 rounded-full p-1 flex items-center backdrop-blur-sm">
-                <Link
+                <a
                   href="/"
+                  onClick={handleNavigation("/")}
                   className={`
                     px-4 sm:px-6 py-2 rounded-full font-medium
                     transition-all duration-200 flex items-center gap-2
@@ -86,10 +117,11 @@ export default function Navbar() {
                     />
                   </svg>
                   <span>Contests</span>
-                </Link>
+                </a>
 
-                <Link
+                <a
                   href="/calendar"
+                  onClick={handleNavigation("/calendar")}
                   className={`
                     px-4 sm:px-6 py-2 rounded-full font-medium
                     transition-all duration-200 flex items-center gap-2
@@ -109,7 +141,7 @@ export default function Navbar() {
                     />
                   </svg>
                   <span>Calendar</span>
-                </Link>
+                </a>
               </div>
             </div>
 
@@ -134,16 +166,16 @@ export default function Navbar() {
 
           {/* Mobile Menu - Expanded when menuOpen is true */}
           {menuOpen && (
-            <div className="sm:hidden py-3 border-t border-white/[0.05] mt-2">
-              <div className="flex flex-col space-y-2">
-                <Link
+            <div className="sm:hidden py-3 border-t border-white/[0.05] mt-2 absolute top-14 left-0 right-0 bg-[#1a1b1e]/95 rounded-b-2xl shadow-xl border-x border-b border-white/[0.05]">
+              <div className="flex flex-col space-y-2 p-2">
+                <a
                   href="/"
+                  onClick={handleNavigation("/")}
                   className={`
                     px-4 py-2 rounded-lg font-medium
                     transition-all duration-200 flex items-center gap-2
                     ${isActiveTab("/")}
                   `}
-                  onClick={() => setMenuOpen(false)}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -158,16 +190,16 @@ export default function Navbar() {
                     />
                   </svg>
                   <span>Contests</span>
-                </Link>
+                </a>
 
-                <Link
+                <a
                   href="/calendar"
+                  onClick={handleNavigation("/calendar")}
                   className={`
                     px-4 py-2 rounded-lg font-medium
                     transition-all duration-200 flex items-center gap-2
                     ${isActiveTab("/calendar")}
                   `}
-                  onClick={() => setMenuOpen(false)}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -182,7 +214,7 @@ export default function Navbar() {
                     />
                   </svg>
                   <span>Calendar</span>
-                </Link>
+                </a>
               </div>
             </div>
           )}

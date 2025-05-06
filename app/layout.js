@@ -2,6 +2,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import SchedulerInitializer from "./components/SchedulerInitializer";
+import { StateProvider } from "./lib/StateContext";
+import ErrorBoundary from "./components/ErrorBoundary";
+import NavigationSafeguard from "./components/NavigationSafeguard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,11 +28,16 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-[#0f1115]`}
       >
-        <SchedulerInitializer />
-        <Navbar />
-        <main className="flex-grow container mx-auto px-4 py-8 mt-20">
-          {children}
-        </main>
+        <ErrorBoundary>
+          <StateProvider>
+            <NavigationSafeguard />
+            <SchedulerInitializer />
+            <Navbar />
+            <main className="flex-grow container mx-auto px-4 py-8 mt-20">
+              {children}
+            </main>
+          </StateProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

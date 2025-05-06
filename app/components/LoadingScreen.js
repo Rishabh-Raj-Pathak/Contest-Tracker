@@ -3,7 +3,6 @@ import { useEffect, useState, useRef } from "react";
 
 export default function LoadingScreen() {
   const [loaded, setLoaded] = useState(false);
-  const [shouldShow, setShouldShow] = useState(true);
   const [activeStep, setActiveStep] = useState(0);
   const [particles, setParticles] = useState([]);
   const isClient = useRef(false);
@@ -14,27 +13,9 @@ export default function LoadingScreen() {
     "Preparing your dashboard...",
   ];
 
-  // Check if we should show the loading screen
+  // Initialize and show loading screen
   useEffect(() => {
     isClient.current = true;
-
-    // Check if this is a new browser session
-    const lastVisitTimestamp = localStorage.getItem("cpTrackerLastVisit");
-    const currentTime = new Date().getTime();
-
-    // If we have a timestamp and it's from the current session (less than 30 minutes ago)
-    // Skip the loading screen
-    if (
-      lastVisitTimestamp &&
-      currentTime - parseInt(lastVisitTimestamp) < 30 * 60 * 1000
-    ) {
-      setShouldShow(false);
-      setLoaded(true);
-      return;
-    }
-
-    // Store current timestamp in localStorage
-    localStorage.setItem("cpTrackerLastVisit", currentTime.toString());
 
     // Generate random particles
     const newParticles = Array.from({ length: 15 }, () => ({
@@ -56,7 +37,7 @@ export default function LoadingScreen() {
       );
     }, 800);
 
-    // Always show loading screen for 3 seconds
+    // Always show loading screen for exactly 3 seconds
     const timer = setTimeout(() => {
       setLoaded(true);
     }, 3000);
@@ -68,7 +49,7 @@ export default function LoadingScreen() {
     };
   }, []);
 
-  if (loaded || !shouldShow) {
+  if (loaded) {
     return null;
   }
 

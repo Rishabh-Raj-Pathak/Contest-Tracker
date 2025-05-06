@@ -1,4 +1,5 @@
 import axios from "axios";
+import { memoizeWithTTL } from "../utils";
 
 // Function to determine contest status
 function getContestStatus(contest) {
@@ -18,7 +19,7 @@ function formatDuration(durationSeconds) {
   return `${hours}h ${minutes}m`;
 }
 
-export async function getCodeforcesContests() {
+async function _getCodeforcesContests() {
   try {
     const response = await axios.get("https://codeforces.com/api/contest.list");
 
@@ -68,3 +69,9 @@ export async function getCodeforcesContests() {
     return [];
   }
 }
+
+// Memoized version with 5 minute cache
+export const getCodeforcesContests = memoizeWithTTL(
+  _getCodeforcesContests,
+  5 * 60 * 1000
+);

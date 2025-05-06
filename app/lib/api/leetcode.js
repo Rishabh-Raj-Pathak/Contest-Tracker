@@ -1,3 +1,5 @@
+import { memoizeWithTTL } from "../utils";
+
 /**
  * @typedef {Object} Contest
  * @property {string} id - Contest identifier (e.g., "weekly-contest-449")
@@ -37,60 +39,75 @@ const CONTEST_PATTERNS = {
  * Generates LeetCode contest data for past, ongoing, and future contests
  * @returns {Promise<Contest[]>} Array of contest objects
  */
-export async function getLeetCodeContests() {
-  // Current time for status calculation
-  const NOW = new Date();
+async function _getLeetCodeContests() {
+  try {
+    // Current time for status calculation
+    const NOW = new Date();
 
-  // How many contests to show in the past (per contest type)
-  const PAST_CONTESTS_COUNT = 4;
+    // How many contests to show in the past (per contest type)
+    const PAST_CONTESTS_COUNT = 4;
 
-  // Calculate cutoff for past contests (30 days ago)
-  const CUTOFF = new Date(NOW.getTime() - 30 * 24 * 60 * 60 * 1000);
+    // Calculate cutoff for past contests (30 days ago)
+    const CUTOFF = new Date(NOW.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-  console.log(
-    "Generating LeetCode contests from",
-    CUTOFF.toISOString(),
-    "to now:",
-    NOW.toISOString()
-  );
-
-  // Initialize contests array
-  let contests = [];
-
-  // Process each contest type to get past and current contests
-  Object.entries(CONTEST_PATTERNS).forEach(([type, pattern]) => {
-    // Generate past and current contests for this pattern
-    const typeContests = generatePastContests(
-      type,
-      pattern,
-      NOW,
-      CUTOFF,
-      PAST_CONTESTS_COUNT
+    console.log(
+      "Generating LeetCode contests from",
+      CUTOFF.toISOString(),
+      "to now:",
+      NOW.toISOString()
     );
 
-    // Add to our contests array
-    contests.push(...typeContests);
-  });
+    // Initialize contests array
+    let contests = [];
 
-  // Now generate exactly the next 2 upcoming contests
-  const upcomingContests = generateUpcomingContests(NOW);
-  contests = [...contests, ...upcomingContests];
+    // Process each contest type to get past and current contests
+    Object.entries(CONTEST_PATTERNS).forEach(([type, pattern]) => {
+      // Generate past and current contests for this pattern
+      const typeContests = generatePastContests(
+        type,
+        pattern,
+        NOW,
+        CUTOFF,
+        PAST_CONTESTS_COUNT
+      );
 
-  // Sort all contests by startTime
-  contests.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
+      // Add to our contests array
+      contests.push(...typeContests);
+    });
 
-  // Log contest counts by status
-  const upcomingCount = contests.filter((c) => c.status === "upcoming").length;
-  const ongoingCount = contests.filter((c) => c.status === "ongoing").length;
-  const pastCount = contests.filter((c) => c.status === "past").length;
+    // Now generate exactly the next 2 upcoming contests
+    const upcomingContests = generateUpcomingContests(NOW);
+    contests = [...contests, ...upcomingContests];
 
-  console.log(`Generated LeetCode contests:
-    - Upcoming: ${upcomingCount}
-    - Ongoing: ${ongoingCount}
-    - Past: ${pastCount}`);
+    // Sort all contests by startTime
+    contests.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
 
-  return contests;
+    // Log contest counts by status
+    const upcomingCount = contests.filter(
+      (c) => c.status === "upcoming"
+    ).length;
+    const ongoingCount = contests.filter((c) => c.status === "ongoing").length;
+    const pastCount = contests.filter((c) => c.status === "past").length;
+
+    console.log(`Generated LeetCode contests:
+      - Upcoming: ${upcomingCount}
+      - Ongoing: ${ongoingCount}
+      - Past: ${pastCount}`);
+
+    return contests;
+  } catch (error) {
+    console.error("Error fetching LeetCode contests:", error);
+    return [];
+  }
 }
+
+/**
+ * Memoized version with 5 minute cache
+ */
+export const getLeetCodeContests = memoizeWithTTL(
+  _getLeetCodeContests,
+  5 * 60 * 1000
+);
 
 /**
  * Generates past contests of a specific type based on the pattern
