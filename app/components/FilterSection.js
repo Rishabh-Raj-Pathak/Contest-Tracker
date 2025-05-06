@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 
 export default function FilterSection({
   selectedPlatforms,
@@ -149,10 +150,12 @@ export default function FilterSection({
                           )}`
                     }`}
                   >
-                    <img
+                    <Image
                       src={platform.logo}
                       alt={platform.name}
                       className="w-4 h-4 rounded"
+                      width={16}
+                      height={16}
                     />
                     <span
                       className={`text-xs ${
@@ -311,10 +314,12 @@ export default function FilterSection({
                       )}`
                 }`}
               >
-                <img
+                <Image
                   src={platform.logo}
                   alt={platform.name}
                   className="w-5 h-5 rounded"
+                  width={20}
+                  height={20}
                 />
                 <span
                   className={`text-sm ${

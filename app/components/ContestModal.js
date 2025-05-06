@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 
 export default function ContestModal({
   isOpen,
@@ -13,6 +14,14 @@ export default function ContestModal({
   const [formattedDate, setFormattedDate] = useState("");
   const [dayOfWeek, setDayOfWeek] = useState("");
   const [dayNumber, setDayNumber] = useState("");
+
+  // Handle close with animation
+  const handleClose = () => {
+    setAnimateIn(false);
+    setTimeout(() => {
+      onClose();
+    }, 300); // Match animation duration
+  };
 
   // Format dates in useEffect to avoid hydration mismatches
   useEffect(() => {
@@ -61,7 +70,7 @@ export default function ContestModal({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, handleClose]);
 
   // Close on escape key
   useEffect(() => {
@@ -78,15 +87,7 @@ export default function ContestModal({
     return () => {
       document.removeEventListener("keydown", handleEscKey);
     };
-  }, [isOpen, onClose]);
-
-  // Handle close with animation
-  const handleClose = () => {
-    setAnimateIn(false);
-    setTimeout(() => {
-      onClose();
-    }, 300); // Match animation duration
-  };
+  }, [isOpen, handleClose]);
 
   if (!isOpen) return null;
 
@@ -240,7 +241,7 @@ export default function ContestModal({
                               className="absolute inset-0 rounded-full animate-pulse opacity-60"
                               style={{ backgroundColor: `${platformColor}10` }}
                             ></div>
-                            <img
+                            <Image
                               src={
                                 contest.platform.toLowerCase() === "leetcode"
                                   ? "https://leetcode.com/favicon-32x32.png"
@@ -251,6 +252,8 @@ export default function ContestModal({
                               }
                               alt={contest.platform}
                               className="w-5 h-5 sm:w-6 sm:h-6 rounded object-contain"
+                              width={24}
+                              height={24}
                             />
                           </div>
 

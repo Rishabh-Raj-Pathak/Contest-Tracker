@@ -47,7 +47,7 @@ export default function LoadingScreen() {
       clearTimeout(timer);
       clearInterval(stepInterval);
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loaded) {
     return null;

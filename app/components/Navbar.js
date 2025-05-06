@@ -46,7 +46,7 @@ export default function Navbar() {
           <div className="h-14 flex items-center justify-between">
             {/* Logo Section */}
             <div className="flex-shrink-0">
-              <a
+              <Link
                 href="/"
                 onClick={handleNavigation("/")}
                 className="flex items-center"
@@ -57,7 +57,7 @@ export default function Navbar() {
                 <span className="font-bold text-xl sm:text-2xl tracking-tight text-white">
                   -Track
                 </span>
-              </a>
+              </Link>
             </div>
 
             {/* Hamburger Menu for XS screens */}
@@ -95,7 +95,7 @@ export default function Navbar() {
             {/* Center Navigation - Hidden on XS, visible on SM and above */}
             <div className="hidden sm:flex flex-1 justify-center space-x-4">
               <div className="bg-black/30 rounded-full p-1 flex items-center backdrop-blur-sm">
-                <a
+                <Link
                   href="/"
                   onClick={handleNavigation("/")}
                   className={`
@@ -117,9 +117,9 @@ export default function Navbar() {
                     />
                   </svg>
                   <span>Contests</span>
-                </a>
+                </Link>
 
-                <a
+                <Link
                   href="/calendar"
                   onClick={handleNavigation("/calendar")}
                   className={`
@@ -141,7 +141,7 @@ export default function Navbar() {
                     />
                   </svg>
                   <span>Calendar</span>
-                </a>
+                </Link>
               </div>
             </div>
 
@@ -168,7 +168,7 @@ export default function Navbar() {
           {menuOpen && (
             <div className="sm:hidden py-3 border-t border-white/[0.05] mt-2 absolute top-14 left-0 right-0 bg-[#1a1b1e]/95 rounded-b-2xl shadow-xl border-x border-b border-white/[0.05]">
               <div className="flex flex-col space-y-2 p-2">
-                <a
+                <Link
                   href="/"
                   onClick={handleNavigation("/")}
                   className={`
@@ -190,9 +190,9 @@ export default function Navbar() {
                     />
                   </svg>
                   <span>Contests</span>
-                </a>
+                </Link>
 
-                <a
+                <Link
                   href="/calendar"
                   onClick={handleNavigation("/calendar")}
                   className={`
@@ -214,7 +214,7 @@ export default function Navbar() {
                     />
                   </svg>
                   <span>Calendar</span>
-                </a>
+                </Link>
               </div>
             </div>
           )}

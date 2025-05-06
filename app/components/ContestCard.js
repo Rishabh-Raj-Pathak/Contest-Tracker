@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   addBookmark,
   removeBookmark,
@@ -259,7 +260,7 @@ export default function ContestCard({
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-2">
-                <img
+                <Image
                   src={platformStyle.logo}
                   alt={platform}
                   className="w-6 h-6 rounded"
