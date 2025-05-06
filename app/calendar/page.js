@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -355,6 +355,19 @@ export default function CalendarPage() {
     setModalOpen(false);
   };
 
+  // Add a cleanup effect to remove any tooltips when unmounting the component
+  useEffect(() => {
+    return () => {
+      // Remove any tooltips that might be left in the DOM when navigating away
+      const tooltips = document.querySelectorAll(".contest-tooltip");
+      tooltips.forEach((tooltip) => {
+        if (tooltip && document.body.contains(tooltip)) {
+          document.body.removeChild(tooltip);
+        }
+      });
+    };
+  }, []);
+
   return (
     <div className="space-y-8 pb-16">
       {/* Premium Header with Glass Effect */}
@@ -496,35 +509,43 @@ export default function CalendarPage() {
                 slotMinTime="00:00:00"
                 slotMaxTime="24:00:00"
                 eventDidMount={(info) => {
-                  // Add tooltips to events
+                  // Create tooltip element
                   const tooltip = document.createElement("div");
-                  tooltip.className = "calendar-tooltip";
-
-                  // Format date properly with explicit locale
-                  const eventDate = new Date(info.event.start);
-                  const formattedTime = eventDate.toLocaleTimeString("en-US", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: true,
-                  });
-
+                  tooltip.className = "contest-tooltip";
+                  tooltip.style.position = "absolute";
+                  tooltip.style.display = "none";
+                  tooltip.style.zIndex = "1000";
+                  tooltip.style.backgroundColor = "rgba(26, 27, 30, 0.95)";
+                  tooltip.style.color = "#fff";
+                  tooltip.style.padding = "12px";
+                  tooltip.style.borderRadius = "12px";
+                  tooltip.style.boxShadow = "0 8px 32px rgba(0, 0, 0, 0.3)";
+                  tooltip.style.fontSize = "0.875rem";
+                  tooltip.style.maxWidth = "300px";
+                  tooltip.style.backdropFilter = "blur(10px)";
+                  tooltip.style.border = "1px solid rgba(255, 255, 255, 0.1)";
+                  tooltip.style.transition = "opacity 0.2s ease-in-out";
                   tooltip.innerHTML = `
-                    <div class="tooltip-platform" style="color: ${
-                      info.event.backgroundColor
-                    }">
-                      ${info.event.extendedProps.platform}
+                    <div class="tooltip-title" style="font-weight: 600; margin-bottom: 6px;">${
+                      info.event.title
+                    }</div>
+                    <div class="tooltip-platform" style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                      <span style="font-weight: 500;">${
+                        info.event.extendedProps.platform
+                      }</span>
                     </div>
-                    <div class="tooltip-title">${info.event.title}</div>
-                    <div class="tooltip-time">
-                      <span class="time-icon">⏰</span> 
-                      ${formattedTime}
+                    <div class="tooltip-time" style="margin-bottom: 4px;">
+                      <span>Start: ${new Date(
+                        info.event.start
+                      ).toLocaleString()}</span>
                     </div>
-                    <div class="tooltip-duration">
-                      <span class="duration-icon">⌛</span> 
-                      ${info.event.extendedProps.duration || "Unknown duration"}
+                    <div class="tooltip-duration" style="margin-bottom: 4px;">
+                      <span>Duration: ${
+                        info.event.extendedProps.duration
+                      }</span>
                     </div>
-                    <div class="tooltip-status">
-                      <span class="status-dot" style="background-color: ${
+                    <div class="tooltip-status" style="display: flex; align-items: center; gap: 6px;">
+                      <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: ${
                         info.event.extendedProps.status === "upcoming"
                           ? "#10B981"
                           : info.event.extendedProps.status === "ongoing"
@@ -532,10 +553,6 @@ export default function CalendarPage() {
                           : "#FCD34D"
                       }"></span>
                       ${info.event.extendedProps.status || "Unknown status"}
-                    </div>
-                    <div class="tooltip-link">
-                      <span class="link-icon">🔍</span>
-                      Click for detailed contest view
                     </div>
                   `;
 
@@ -556,7 +573,9 @@ export default function CalendarPage() {
 
                   // Clean up on event unmount
                   info.event.remove = () => {
-                    document.body.removeChild(tooltip);
+                    if (document.body.contains(tooltip)) {
+                      document.body.removeChild(tooltip);
+                    }
                   };
                 }}
                 moreLinkClick="popover"
@@ -892,97 +911,6 @@ export default function CalendarPage() {
           color: rgba(255, 255, 255, 0.7) !important;
         }
 
-        /* Custom Tooltip */
-        .calendar-tooltip {
-          position: absolute;
-          display: none;
-          background: rgba(30, 30, 40, 0.98);
-          border: 1px solid rgba(139, 92, 246, 0.3);
-          border-radius: 12px;
-          padding: 12px;
-          z-index: 10000;
-          max-width: 280px;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3),
-            0 0 0 1px rgba(255, 255, 255, 0.05);
-          backdrop-filter: blur(10px);
-          transform: translateY(8px);
-          animation: tooltip-appear 0.2s forwards;
-          pointer-events: none;
-        }
-
-        @keyframes tooltip-appear {
-          from {
-            opacity: 0;
-            transform: translateY(16px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(8px);
-          }
-        }
-
-        .tooltip-title {
-          font-weight: bold;
-          font-size: 1rem;
-          margin-bottom: 6px;
-          color: white;
-          line-height: 1.3;
-        }
-
-        .tooltip-platform {
-          font-size: 0.8rem;
-          font-weight: 600;
-          margin-bottom: 6px;
-          display: inline-block;
-          padding: 2px 8px;
-          border-radius: 4px;
-          background-color: rgba(255, 255, 255, 0.1);
-          letter-spacing: 0.5px;
-          text-transform: uppercase;
-        }
-
-        .tooltip-time,
-        .tooltip-status {
-          font-size: 0.85rem;
-          color: rgba(255, 255, 255, 0.7);
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          margin-top: 4px;
-        }
-
-        .tooltip-link {
-          font-size: 0.85rem;
-          color: rgba(139, 92, 246, 0.9);
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          margin-top: 8px;
-          padding-top: 8px;
-          border-top: 1px dashed rgba(255, 255, 255, 0.1);
-          font-weight: 500;
-        }
-
-        .tooltip-duration {
-          font-size: 0.85rem;
-          color: rgba(255, 255, 255, 0.7);
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          margin-top: 4px;
-        }
-
-        .time-icon {
-          font-size: 0.9rem;
-        }
-
-        .status-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          display: inline-block;
-        }
-
         /* Mobile optimization */
         @media (max-width: 768px) {
           .contest-calendar .fc-toolbar.fc-header-toolbar {
@@ -1023,17 +951,6 @@ export default function CalendarPage() {
           .contest-calendar .fc-col-header-cell-cushion {
             padding: 6px 2px;
           }
-
-          .calendar-tooltip {
-            max-width: calc(100% - 20px);
-            left: 10px !important;
-            right: 10px;
-            font-size: 0.8rem;
-          }
-
-          .tooltip-title {
-            font-size: 0.9rem;
-          }
         }
 
         /* Small mobile screens */
@@ -1062,6 +979,23 @@ export default function CalendarPage() {
           .contest-calendar .fc-list-event-title {
             font-size: 0.8rem;
           }
+        }
+
+        .contest-modal-content .modal-empty {
+          text-align: center;
+          padding: 20px;
+          color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Loader styles */
+        .calendar-spinner {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          border: 4px solid rgba(139, 92, 246, 0.1);
+          border-left-color: rgba(139, 92, 246, 0.8);
+          animation: spin 1s linear infinite;
+          margin: 40px auto;
         }
       `}</style>
     </div>

@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
 import FilterSection from "./components/FilterSection";
 import ContestCard from "./components/ContestCard";
 import LoadingScreen from "./components/LoadingScreen";
+import SearchParamsHandler from "./components/SearchParamsHandler";
 import { getCodeforcesContests } from "./lib/api/codeforces";
 import { getLeetCodeContests } from "./lib/api/leetcode";
 import {
@@ -13,7 +13,6 @@ import {
 } from "./lib/bookmarkStorage";
 
 export default function Home() {
-  const searchParams = useSearchParams();
   const [codeforcesContests, setCodeforcesContests] = useState([]);
   const [leetcodeContests, setLeetcodeContests] = useState([]);
   const [codechefContests, setCodechefContests] = useState([]);
@@ -26,20 +25,6 @@ export default function Home() {
   const [bookmarkedContests, setBookmarkedContests] = useState([]);
   const [highlightedContest, setHighlightedContest] = useState(null);
   const [showLoadingScreen, setShowLoadingScreen] = useState(true);
-
-  // Handle URL parameters when navigating from calendar
-  useEffect(() => {
-    const platform = searchParams.get("platform");
-    const highlight = searchParams.get("highlight");
-
-    if (platform) {
-      setSelectedPlatforms([platform]);
-    }
-
-    if (highlight) {
-      setHighlightedContest(decodeURIComponent(highlight));
-    }
-  }, [searchParams]);
 
   useEffect(() => {
     // Load bookmarked contests from localStorage
@@ -309,6 +294,14 @@ export default function Home() {
 
   return (
     <>
+      {/* Wrap the SearchParamsHandler in a Suspense boundary */}
+      <Suspense fallback={null}>
+        <SearchParamsHandler
+          setSelectedPlatforms={setSelectedPlatforms}
+          setHighlightedContest={setHighlightedContest}
+        />
+      </Suspense>
+
       {showLoadingScreen && <LoadingScreen />}
       <div
         className={`flex flex-col lg:flex-row gap-8 ${
