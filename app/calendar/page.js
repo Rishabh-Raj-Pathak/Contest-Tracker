@@ -5,6 +5,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { useRouter } from "next/navigation";
 import ContestModal from "../components/ContestModal";
+import LoadingScreen from "../components/LoadingScreen";
 // Import the same fetching functions used in the main page
 import { getCodeforcesContests } from "../lib/api/codeforces";
 import { getLeetCodeContests } from "../lib/api/leetcode";
@@ -20,12 +21,46 @@ export default function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(!calendarData);
+  // Check if this is a fresh page load (refresh or initial visit)
+  const [showLoadingScreen, setShowLoadingScreen] = useState(false);
   const [allContests, setAllContests] = useState(
     calendarData?.allContests || []
   );
   const [debugInfo, setDebugInfo] = useState(
     calendarData?.debugInfo || { loaded: false, count: 0 }
   );
+
+  // Check if this is a fresh page load and set loading screen accordingly
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      // Check for page load session flag, specifically for calendar page
+      const isPageFreshLoad = !sessionStorage.getItem("calendar_page_loaded");
+
+      if (isPageFreshLoad) {
+        // This is a fresh page load, show loading screen for full duration
+        setShowLoadingScreen(true);
+
+        // Set the flag so we don't show the loading screen again during navigation
+        sessionStorage.setItem("calendar_page_loaded", "true");
+
+        // Clear the flag when the user leaves the page (for refresh detection)
+        window.addEventListener("beforeunload", () => {
+          sessionStorage.removeItem("calendar_page_loaded");
+        });
+      }
+    }
+  }, []);
+
+  // Always show loading for full duration if it's active
+  useEffect(() => {
+    if (showLoadingScreen) {
+      const timer = setTimeout(() => {
+        setShowLoadingScreen(false);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showLoadingScreen]);
 
   // State for platform-specific contests, same as in the main page
   const [codeforcesContests, setCodeforcesContests] = useState(
@@ -466,8 +501,15 @@ export default function CalendarPage() {
 
   return (
     <div className="space-y-8 pb-16">
+      {/* Show LoadingScreen component while loading */}
+      {showLoadingScreen && <LoadingScreen />}
+
       {/* Premium Header with Glass Effect */}
-      <div className="rounded-2xl bg-gradient-to-r from-[#1a1b1e]/90 to-[#2a2b30]/90 border border-white/[0.08] p-4 sm:p-6 md:p-8 shadow-2xl backdrop-blur-md">
+      <div
+        className={`rounded-2xl bg-gradient-to-r from-[#1a1b1e]/90 to-[#2a2b30]/90 border border-white/[0.08] p-4 sm:p-6 md:p-8 shadow-2xl backdrop-blur-md ${
+          showLoadingScreen ? "opacity-0 invisible" : "opacity-100 visible"
+        } transition-opacity duration-500`}
+      >
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
           <div className="space-y-2 md:space-y-3">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
@@ -516,7 +558,11 @@ export default function CalendarPage() {
       </div>
 
       {/* Calendar Container with enhanced styling */}
-      <div className="rounded-2xl bg-gradient-to-b from-[#1a1b1e]/95 to-[#23242b]/95 border border-white/[0.08] p-0 shadow-2xl backdrop-blur-sm overflow-hidden">
+      <div
+        className={`rounded-2xl bg-gradient-to-b from-[#1a1b1e]/95 to-[#23242b]/95 border border-white/[0.08] p-0 shadow-2xl backdrop-blur-sm overflow-hidden ${
+          showLoadingScreen ? "opacity-0 invisible" : "opacity-100 visible"
+        } transition-opacity duration-500`}
+      >
         {/* Decorative elements */}
         <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl"></div>
@@ -545,7 +591,7 @@ export default function CalendarPage() {
 
         {/* Calendar content */}
         <div className="relative z-10 p-2 sm:p-4 md:p-6">
-          {loading ? (
+          {loading && !showLoadingScreen ? (
             <div className="py-20 flex flex-col items-center justify-center">
               <div className="relative w-16 h-16">
                 <div className="w-16 h-16 rounded-full border-2 border-white/10 animate-spin"></div>
@@ -682,7 +728,11 @@ export default function CalendarPage() {
       </div>
 
       {/* Mobile note with premium styling */}
-      <div className="md:hidden p-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-lg border border-white/10">
+      <div
+        className={`md:hidden p-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-lg border border-white/10 ${
+          showLoadingScreen ? "opacity-0 invisible" : "opacity-100 visible"
+        } transition-opacity duration-500`}
+      >
         <div className="flex items-start gap-3">
           <div className="text-white/70 mt-0.5">
             <svg

@@ -43,7 +43,30 @@ export default function Home() {
     contestsData?.bookmarkedContests || []
   );
   const [highlightedContest, setHighlightedContest] = useState(null);
-  const [showLoadingScreen, setShowLoadingScreen] = useState(!contestsData);
+
+  // Check if this is a fresh page load (from refresh or initial visit)
+  const [showLoadingScreen, setShowLoadingScreen] = useState(false);
+
+  // Use an effect to check if this is a fresh page load
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      // Check for page load session flag
+      const isPageFreshLoad = !sessionStorage.getItem("page_loaded");
+
+      if (isPageFreshLoad) {
+        // This is a fresh page load, show loading screen for full duration
+        setShowLoadingScreen(true);
+
+        // Set the flag so we don't show the loading screen again during navigation
+        sessionStorage.setItem("page_loaded", "true");
+
+        // Clear the flag when the user leaves the page (for refresh detection)
+        window.addEventListener("beforeunload", () => {
+          sessionStorage.removeItem("page_loaded");
+        });
+      }
+    }
+  }, []);
 
   // Save state to context on changes
   useEffect(() => {
@@ -178,7 +201,7 @@ export default function Home() {
     };
   }, [contestsNeedRefresh, contestsData]);
 
-  // Always show the loading screen for the full animation duration
+  // Always show the loading screen for the full animation duration if it's showing
   useEffect(() => {
     // Only set timer if we need to show loading screen
     if (showLoadingScreen) {
@@ -189,9 +212,6 @@ export default function Home() {
       return () => clearTimeout(timer);
     }
   }, [showLoadingScreen]);
-
-  // Remove the effect that checks if data is loaded
-  // This ensures the full animation plays regardless of data loading speed
 
   async function fetchContests() {
     // Fetch Codeforces contests first (usually faster)
